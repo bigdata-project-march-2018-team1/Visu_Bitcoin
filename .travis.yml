@@ -1,0 +1,11 @@
+language: python
+python:
+    - "3.6"
+
+# dependencies install
+install:
+    - pip install -r requirements.txt
+
+# testing
+script:
+    - echo "placeholder insert test here!"
