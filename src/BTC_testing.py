@@ -32,8 +32,12 @@ def getDatePrice(start, end, host = DEFAULT_HOST, path = DEFAULT_URI):
     return result
 
 def createHistoricalDataset(jsonData):
+<<<<<<< Updated upstream:src/BTC_testing.py
     """Creates a list from the json data"""
     list =[]
+=======
+    list = []
+>>>>>>> Stashed changes:BTC_testing.py
     for key,val in jsonData['bpi'].items():
         tempDic = {}
         tempDic['date'] = key
