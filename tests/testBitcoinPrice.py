@@ -1,3 +1,5 @@
+import sys, os
+sys.path.append(os.path.abspath(os.path.dirname(__file__) + '/' + '../src'))
 from BTC_testing import getCurrentPrice, getDatePrice, createCurrentDataset, createHistoricalDataset
 
 """
@@ -22,4 +24,3 @@ def testCreateHistoricalDataset():
     for val in createHistoricalDataset(jsonData):
         assert val['date'] == "2018-01-04"
         assert val['value'] == 15155.2263
-

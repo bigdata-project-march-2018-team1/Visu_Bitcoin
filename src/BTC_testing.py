@@ -32,12 +32,8 @@ def getDatePrice(start, end, host = DEFAULT_HOST, path = DEFAULT_URI):
     return result
 
 def createHistoricalDataset(jsonData):
-<<<<<<< Updated upstream:src/BTC_testing.py
     """Creates a list from the json data"""
-    list =[]
-=======
     list = []
->>>>>>> Stashed changes:BTC_testing.py
     for key,val in jsonData['bpi'].items():
         tempDic = {}
         tempDic['date'] = key
@@ -65,16 +61,16 @@ def main():
 
     
     ''' Get the current value from the API '''
-  #  jsonDataStream = getCurrentPrice()
- #   currentDataset = createCurrentDataset(jsonDataStream)
+    jsonDataStream = getCurrentPrice()
+    currentDataset = createCurrentDataset(jsonDataStream)
 
     ''' Initializes the connection'''
     connections.create_connection(hosts=['localhost'])
    
     ''' Puts the historical data into elasticsearch '''
-    #add_historical_data("2010-07-17","2018-03-20")
+    add_historical_data("2010-07-17","2018-03-20")
 
-  #  storeData(currentDataset)
+    storeData(currentDataset)
 
 if __name__ == "__main__":
     main()   
