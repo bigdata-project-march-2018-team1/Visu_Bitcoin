@@ -32,6 +32,7 @@ def getDatePrice(start, end, host = DEFAULT_HOST, path = DEFAULT_URI):
     return result
 
 def createHistoricalDataset(jsonData):
+    """Creates a list from the json data"""
     list =[]
     for key,val in jsonData['bpi'].items():
         tempDic = {}
@@ -46,22 +47,30 @@ def createCurrentDataset(jsonDataStream):
     currentDic['value'] = jsonDataStream['bpi']['EUR']['rate_float']
     return currentDic
 
+def add_historical_data(start, end):
+    ''' Get data from the API between two dates '''
+    eraseData() 
+    jsonDataH = getDatePrice(start,end)
+    historicalDataset = createHistoricalDataset(jsonDataH)
+    for val in historicalDataset:
+        storeData(val)
+
+
 def main():
     #pp = pprint.PrettyPrinter(indent=DEFAULT_PP_INDENT)
 
-    ''' Get data from the API between two dates '''
-    jsonDataH = getDatePrice("2018-01-01","2018-02-01")
-    historicalDataset = createHistoricalDataset(jsonDataH)
     
     ''' Get the current value from the API '''
-    jsonDataStream = getCurrentPrice()
-    currentDataset = createCurrentDataset(jsonDataStream)
+  #  jsonDataStream = getCurrentPrice()
+ #   currentDataset = createCurrentDataset(jsonDataStream)
 
-    ''' Put the data into elasticsear '''
+    ''' Initializes the connection'''
     connections.create_connection(hosts=['localhost'])
-    #eraseData()
-    storeData(historicalDataset)
-    storeData(currentDataset)
+   
+    ''' Puts the historical data into elasticsearch '''
+    #add_historical_data("2010-07-17","2018-03-20")
+
+  #  storeData(currentDataset)
 
 if __name__ == "__main__":
     main()   
