@@ -12,7 +12,7 @@ def testCurrentPrice():
 def testDatePrice():
     start = "2018-01-04"
     end = "2018-01-04"
-    assert getDatePrice(start,end) != {}
+    assert getDatePrice(start,end) != {} 
 
 def testCreateCurrentDataset():
     jsonDataStream = { 'time': { 'updatedISO': "2018-01-04" }, 'bpi': { 'EUR': { 'rate_float': 15155.2263 }}}
