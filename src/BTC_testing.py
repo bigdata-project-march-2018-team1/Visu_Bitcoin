@@ -68,24 +68,14 @@ def add_historical_data(start, end):
     }
   for data in historicalDataset
 ]
-    es=Elasticsearch()
-    helpers.bulk(es, actions)
+    helpers.bulk(connections.get_connection(), actions)
 
-def main():
-    #pp = pprint.PrettyPrinter(indent=DEFAULT_PP_INDENT)
-
-    
-    ''' Get the current value from the API '''
-    jsonDataStream = getCurrentPrice()
-    currentDataset = createCurrentDataset(jsonDataStream)
-
+def insertHistoricalDataInBase(conf):
     ''' Initializes the connection'''
-    connections.create_connection(hosts=['localhost'])
+    connections.create_connection(hosts=conf['hosts'])
    
     ''' Puts the historical data into elasticsearch '''
     add_historical_data("2010-07-17","2018-03-20")
 
-    storeData(currentDataset)
-
 if __name__ == "__main__":
-    main()   
+    insertHistoricalDataInBase({"hosts": ["localhost"]})
