@@ -1,12 +1,12 @@
 from elasticsearch import Elasticsearch
 from elasticsearch_dsl.connections import connections
-from elasticsearch_dsl import DocType, Object, Integer, Date
+from elasticsearch_dsl import DocType, Object, Integer, Date, Float
 from elasticsearch_dsl import Search
 
 class BitCoin(DocType):
     """ Defines the mapping for ElasticSearch """
     date=Date()
-    value=Integer()
+    value=Float()
 
     class Meta:
         index = 'bitcoin'
