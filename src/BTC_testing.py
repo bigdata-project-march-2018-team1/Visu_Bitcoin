@@ -23,6 +23,7 @@ def getCurrentPrice(host = DEFAULT_HOST, path = DEFAULT_URI):
     return result
 
 def getDatePrice(start, end, host = DEFAULT_HOST, path = DEFAULT_URI):
+    ''' Call the API to get all the bitcoin values between two dates '''
     connection = httpClient.HTTPConnection(host)
     path = "/v1/bpi/historical/EUR.json?start="+start+"&end="+end
     connection.request("GET", path)
@@ -51,23 +52,23 @@ def createCurrentDataset(jsonDataStream):
     return currentDic
 
 def add_historical_data(start, end):
-    ''' Get data from the API between two dates '''
+    ''' Get data from the API between two dates
+    and then inserts them into the ElasticSearch db '''
     eraseData() 
     jsonDataH = getDatePrice(start,end)
     historicalDataset = createHistoricalDataset(jsonDataH)
-#    for val in historicalDataset:
-#        storeData(val)
 
-    '''call to bulk api to store the data'''
+    ''' Call to bulk api to store the data '''
     actions=[
-    {
-    "_index": "bitcoin",
-    "_type": "doc",
-    "date": data['date'],
-    "value": data['value']
-    }
-  for data in historicalDataset
-]
+        {
+        "_index": "bitcoin",
+        "_type": "doc",
+        "date": data['date'],
+        "value": data['value'],
+        "type": "historical"
+        }
+        for data in historicalDataset
+    ]
     es=Elasticsearch()
     helpers.bulk(es, actions)
 
@@ -85,7 +86,11 @@ def main():
     ''' Puts the historical data into elasticsearch '''
     add_historical_data("2010-07-17","2018-03-20")
 
-    storeData(currentDataset)
+  #  storeData(currentDataset)
+    # Tests
+    # storeData('2018-03-21T06:00:00', 9000.0, "realtime")
+    # storeData('2018-03-21T07:00:00', 9010.0, "realtime")
+    # storeData('2018-03-21T08:00:00', 9020.0, "realtime")
 
 if __name__ == "__main__":
     main()   
