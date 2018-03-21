@@ -1,6 +1,8 @@
 from http import client as httpClient
 from http import HTTPStatus
 from elasticsearch_dsl.connections import connections
+from elasticsearch import Elasticsearch
+from elasticsearch import helpers
 import json
 import pprint 
 
@@ -36,7 +38,8 @@ def createHistoricalDataset(jsonData):
     list =[]
     for key,val in jsonData['bpi'].items():
         tempDic = {}
-        tempDic['date'] = key
+        tempDic['date'] = key+"T23:59:00"
+        #print(tempDic['date'])
         tempDic['value'] = val
         list.append(tempDic)
     return list
@@ -52,9 +55,21 @@ def add_historical_data(start, end):
     eraseData() 
     jsonDataH = getDatePrice(start,end)
     historicalDataset = createHistoricalDataset(jsonDataH)
-    for val in historicalDataset:
-        storeData(val)
+#    for val in historicalDataset:
+#        storeData(val)
 
+    '''call to bulk api to store the data'''
+    actions=[
+    {
+    "_index": "bitcoin",
+    "_type": "doc",
+    "date": data['date'],
+    "value": data['value']
+    }
+  for data in historicalDataset
+]
+    es=Elasticsearch()
+    helpers.bulk(es, actions)
 
 def main():
     #pp = pprint.PrettyPrinter(indent=DEFAULT_PP_INDENT)
@@ -68,7 +83,7 @@ def main():
     connections.create_connection(hosts=['localhost'])
    
     ''' Puts the historical data into elasticsearch '''
-    #add_historical_data("2010-07-17","2018-03-20")
+    add_historical_data("2010-07-17","2018-03-20")
 
   #  storeData(currentDataset)
 
