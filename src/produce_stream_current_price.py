@@ -28,7 +28,7 @@ def send_to_spark(current, tcp_connection,s):
 
 def produce_stream_current(tcp_ip = "localhost",tcp_port = 9002):
     """
-    Create a socket who listening in hostname:port and send the current price to SparkStreming client.
+    Create a socket who listening in hostname:port and send the current price to SparkStreaming client.
     """
 
     global conn

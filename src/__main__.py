@@ -1,9 +1,11 @@
 # -*- coding: utf-8 -*-
 # TODO main script as java app?
 import logging
+from threading import Thread
 
 from BTC_testing import insertHistoricalDataInBase as batchFunc 
-#from tba import tba as streamFunction
+from streamingPrice import streamingPriceDict as streamFunction
+from produce_stream_current_price import produce_stream_current
 
 from config import config
 
@@ -17,16 +19,8 @@ def callLogger(fn, *arg):
 def streamFunc():
     print("TODO call func")
 
-<<<<<<< HEAD
-#callLogger(batchFunc, config)
-
-# producer = Thread(target=produce_stream_current)
-# producer.start()
-callLogger(streamFunction, config)
-=======
 callLogger(batchFunc, config)
-while(True):
-    time.sleep(60)
-    callLogger(streamFunction, config)
->>>>>>> d7783a3f84896299f04541c4c96fa55f97f6292c
 
+producer = Thread(target=produce_stream_current)
+producer.start()
+callLogger(streamFunction, config)

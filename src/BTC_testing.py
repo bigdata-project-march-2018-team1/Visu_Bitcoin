@@ -23,7 +23,7 @@ def getCurrentPrice(host = DEFAULT_HOST, path = DEFAULT_URI):
 def getDatePrice(start, end, host = DEFAULT_HOST, path = DEFAULT_URI):
     ''' Call the API to get all the bitcoin values between two dates '''
     connection = httpClient.HTTPConnection(host)
-    path = "/v1/bpi/historical/EUR.json?start="+start+"&end="+end
+    path = "/v1/bpi/historical/close.json?currency=EUR&start="+start+"&end="+end
     connection.request("GET", path)
     resp = connection.getresponse()
     result = {}

@@ -13,7 +13,7 @@ def send(rdd, host):
         connections.create_connection(hosts=[host])
         storeData(date, float(value), "real-time")
 
-def streamingPrice(master="local[2]", appName="CurrentPrice" , producer_host="localhost", db_host="localhost", port=9002):
+def streamingPrice(master="local[2]", appName="CurrentPrice" , producer_host="localhost", db_host="db", port=9002):
     """
     Create a streaming who listening in hostname:port, get a text from a socket server and print it every 60 secondes.
     """
@@ -39,7 +39,7 @@ def streamingPrice(master="local[2]", appName="CurrentPrice" , producer_host="lo
     #ssc.stop()
 
 def streamingPriceDict(conf):   
-    streamingPrice(db_host=conf['hostname'])
+    streamingPrice(db_host=conf['hosts'][0])
 
 if __name__ == "__main__":
     streamingPrice()
