@@ -21,9 +21,9 @@ def storeData(d, v, t):
     b=BitCoin(date=d,value=v,type=t)
     b.save()
 
-def eraseData():
+def eraseData(index):
     """ Erase date in the database """
-    s = Search(index='bitcoin').query("match", _index="bitcoin")
+    s = Search(index=index).query("match", _index=index)
     response = s.delete()
     print(response)
 
@@ -31,14 +31,11 @@ def main():
     
     # Defines a default Elasticsearch client
     connections.create_connection(hosts=['localhost'])
-
     # Data are in a dictionary
-  #  bitcoinDict = [{'date':'2018-01-01','valeur':6000.0},{'date':'2018-01-02','valeur':6030.0}]
-
-    #eraseData()
-
+    bitcoinDict = [{'date':'2018-01-01','valeur':6000.0},{'date':'2018-01-02','valeur':6030.0}]
+    eraseData()
     # Calls the storage function
-   # storeData(bitcoinDict)
+    storeData(bitcoinDict)
 
 if __name__=='__main__':
     main()

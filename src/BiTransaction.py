@@ -43,7 +43,7 @@ def getListBlocks_between2dates(start, end, host = DEFAULT_HOST, uri = URI_BLOCK
     start_datetime = dateToDateTime(start)
     current_dateTime = start_datetime + td(days=1)
     end_timestemp = dateToDateTime(end)
-    while current_dateTime != end_timestemp:
+    while current_dateTime <= end_timestemp:
         blocks_list.append(getListBlocks_1day(current_dateTime.strftime('%Y-%m-%d')))
         current_dateTime += td(days=1)
     return blocks_list
@@ -90,9 +90,10 @@ def add_historical_tx(historicalDataset):
             "id_tx": data['id_tx'],
             "type": "historical"
         }
-        for data in historicalDataset
+        for data in historicalDataset[0:1]
     ]
-    helpers.bulk(connections.get_connection(), actions)
+    if (len(actions) > 0):
+        helpers.bulk(connections.get_connection(), actions)
 
 def unroll(gen):
     for items in gen:
@@ -110,13 +111,31 @@ def filter_listeBlocks(blocks):
 
 def insert_historical_tx(start, end, conf):
     connections.create_connection(hosts=conf['hosts'])
-    eraseData()
+    # TODO dev do your work!
+    logging.info("deleting index")
+    try:
+        eraseData("bitcoin_tx")
+    except:
+        pass
+
+    logging.info("fetching all block between {start} and {end}".format(start=start, end=end))
     list_blocks_2dates = getListBlocks_between2dates(start,end)
     list_hash_tx = filter_listeBlocks(list_blocks_2dates)
     for block in list_hash_tx:
+        logging.info("adding volumes for block : {block}".format(block=block))
         tx = getList_txBlock(block['id_block'])['tx']
         hist_tx = filter_tx(tx)
         add_historical_tx(hist_tx)
 
 if __name__ == "__main__":
-    insert_historical_tx("2018-01-01", "2018-03-22", {"hosts": ["localhost"]})
+    import logging
+    import sys
+
+    logging.basicConfig(level=logging.DEBUG)
+    if len(sys.argv) > 2:
+        startDate = sys.argv[1]
+        endDate = sys.argv[2]
+        logging.info("Starting volume insertion from {start} to {end}".format(start=startDate, end=endDate))
+        insert_historical_tx(startDate, endDate, {"hosts": ["db"]})
+    else:
+        print("missing argument !")

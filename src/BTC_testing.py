@@ -52,7 +52,7 @@ def add_historical_data(start, end):
     ''' Get data from the API between two dates '''
     # TODO use head request
     try:
-        eraseData()
+        eraseData("bitcoin")
     except:
         logging.info("no data to erase! :(")
     jsonDataH = getDatePrice(start,end)

@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 # TODO main script as java app?
 import logging
+import time
 
 from BTC_testing import insertHistoricalDataInBase as batchFunc 
 #from tba import tba as streamFunction
