@@ -1,7 +1,6 @@
 from http import client as httpClient
 from http import HTTPStatus
 from elasticsearch_dsl.connections import connections
-from elasticsearch import Elasticsearch
 from elasticsearch import helpers
 import json
 import logging
@@ -22,6 +21,7 @@ def getCurrentPrice(host = DEFAULT_HOST, path = DEFAULT_URI):
     return result
 
 def getDatePrice(start, end, host = DEFAULT_HOST, path = DEFAULT_URI):
+    ''' Call the API to get all the bitcoin values between two dates '''
     connection = httpClient.HTTPConnection(host)
     path = "/v1/bpi/historical/EUR.json?start="+start+"&end="+end
     connection.request("GET", path)
@@ -38,7 +38,6 @@ def createHistoricalDataset(jsonData):
     for key,val in jsonData['bpi'].items():
         tempDic = {}
         tempDic['date'] = key+"T23:59:00"
-        #print(tempDic['date'])
         tempDic['value'] = val
         list.append(tempDic)
     return list
@@ -59,7 +58,7 @@ def add_historical_data(start, end):
     jsonDataH = getDatePrice(start,end)
     historicalDataset = createHistoricalDataset(jsonDataH)
 
-    '''call to bulk api to store the data'''
+    ''' Call to bulk api to store the data '''
     actions=[
       {
         "_index": "bitcoin",
