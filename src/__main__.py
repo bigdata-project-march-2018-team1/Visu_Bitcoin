@@ -26,6 +26,6 @@ callLogger(batchFunc, config)
 producer = Thread(produce_stream_current)
 producer.start()
 while(True):
-    time.sleep(60)
     callLogger(streamFunction, config)
+    time.sleep(60)
 
