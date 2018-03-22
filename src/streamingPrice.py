@@ -7,10 +7,12 @@ from elastic_storage import storeData,BitCoin,eraseData
 
 def send(rdd):
     data_tx=rdd.collect()
-    date=data_tx[0][1]
-    value=data_tx[0][0]
-    connections.create_connection(hosts=['localhost'])
-    storeData(d=date,v=value,t="real-time")
+    if data_tx:
+        date=data_tx[0][0]
+        value=data_tx[0][1]
+        print (date, value)
+        connections.create_connection(hosts=['localhost'])
+        storeData(date, float(value), "real-time")
 
 def streamingPrice(master="local[2]", appName="CurrentPrice" , hostname="localhost", port=9002):
     """
@@ -22,7 +24,8 @@ def streamingPrice(master="local[2]", appName="CurrentPrice" , hostname="localho
     lines = ssc.socketTextStream( hostname , port )
     words = lines.map(lambda line: line.strip("{}"))\
     .map(lambda str: str.split(","))\
-    .map(lambda line: (float(line[0].split(":")[1]),line[1].split(":",1)[1].strip('\" ')))
+    .map(lambda line: (line[0].split(":",1)[1].strip('\" '), line[1].split(":")[1].strip('\" ')))\
+    .map(lambda tuple: (tuple[0].split("+")[0],tuple[1]))
 
 
     #conf = {"es.resource" : "index/type"}   # assume Elasticsearch is running on localhost defaults
