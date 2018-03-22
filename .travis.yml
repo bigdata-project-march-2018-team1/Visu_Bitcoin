@@ -9,4 +9,4 @@ install:
 # testing
 script:
     - echo "Test begin!!"
-    - bash test.sh
+    - pytest src/testBitcoinPrice.py
