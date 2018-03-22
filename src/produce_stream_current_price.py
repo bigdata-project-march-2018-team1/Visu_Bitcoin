@@ -1,11 +1,11 @@
 import socket
 import sys
-import requests
 import json
 import time
 import random
-from BTC_testing import getCurrentPrice,createCurrentDataset
 from json import JSONEncoder
+
+from BTC_testing import getCurrentPrice,createCurrentDataset
 
 conn=None
 
