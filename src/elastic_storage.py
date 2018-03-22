@@ -8,7 +8,7 @@ class BitCoin(DocType):
     date=Date()
     value=Float()
     type=Text
-
+    
     class Meta:
         index = 'bitcoin'
     
