@@ -23,7 +23,7 @@ def streamFunc():
 
 callLogger(batchFunc, config)
 
-producer = Thread(produce_stream_current)
+producer = Thread(target=produce_stream_current)
 producer.start()
 while(True):
     callLogger(streamFunction, config)
