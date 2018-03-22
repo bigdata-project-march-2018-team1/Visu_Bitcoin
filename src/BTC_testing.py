@@ -52,7 +52,11 @@ def add_historical_data(start, end):
     ''' Get data from the API between two dates '''
     # TODO use head request
     try:
+<<<<<<< HEAD
         eraseData("historical")
+=======
+        eraseData("bitcoin")
+>>>>>>> 92a3b980f3b899d54e5d8f0f9689135481984d4d
     except:
         logging.info("no data to erase! :(")
     jsonDataH = getDatePrice(start,end)
@@ -79,4 +83,6 @@ def insertHistoricalDataInBase(conf):
     add_historical_data("2010-07-17","2018-03-22")
 
 if __name__ == "__main__":
-    insertHistoricalDataInBase({"hosts": ["localhost"]})
+    #insertHistoricalDataInBase({"hosts": ["localhost"]})
+    connections.create_connection(hosts='localhost')
+    storeData("2010-02-23",2654.23,'real-time')
