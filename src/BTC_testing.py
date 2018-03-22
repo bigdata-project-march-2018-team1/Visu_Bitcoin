@@ -52,7 +52,7 @@ def add_historical_data(start, end):
     ''' Get data from the API between two dates '''
     # TODO use head request
     try:
-        eraseData("bitcoin")
+        eraseData("historical")
     except:
         logging.info("no data to erase! :(")
     jsonDataH = getDatePrice(start,end)
@@ -64,7 +64,8 @@ def add_historical_data(start, end):
         "_index": "bitcoin",
         "_type": "doc",
         "date": data['date'],
-        "value": data['value']
+        "value": data['value'],
+        "type": "historical"
       }
       for data in historicalDataset
     ]
@@ -75,7 +76,7 @@ def insertHistoricalDataInBase(conf):
     connections.create_connection(hosts=conf['hosts'])
    
     ''' Puts the historical data into elasticsearch '''
-    add_historical_data("2010-07-17","2018-03-20")
+    add_historical_data("2010-07-17","2018-03-22")
 
 if __name__ == "__main__":
     #insertHistoricalDataInBase({"hosts": ["localhost"]})

@@ -43,7 +43,7 @@ def getListBlocks_between2dates(start, end, host = DEFAULT_HOST, uri = URI_BLOCK
     start_datetime = dateToDateTime(start)
     current_dateTime = start_datetime + td(days=1)
     end_timestemp = dateToDateTime(end)
-    while current_dateTime <= end_timestemp:
+    while current_dateTime != end_timestemp:
         blocks_list.append(getListBlocks_1day(current_dateTime.strftime('%Y-%m-%d')))
         current_dateTime += td(days=1)
     return blocks_list
@@ -68,15 +68,14 @@ def getList_txBlock(block, host=DEFAULT_HOST, path=URI_TRANSACTIONS):
 
 def filter_tx(data):
     tx_filter = []
-    for js in data:
-        if "inputs" in js.keys():
-            time = datetime.datetime.fromtimestamp(js['time']).strftime('%Y-%m-%dT%H:%M:%S')
-            for json in js['inputs']:
-                current = {}
-                current['date'] = time
-                current['id_tx'] = json['prev_out']['tx_index']
-                current['value'] = json['prev_out']['value']
-                tx_filter.append(current)
+    for js in data[1:]:
+        time = datetime.datetime.fromtimestamp(js['time']).strftime('%Y-%m-%dT%H:%M:%S')
+        for json in js['inputs']:
+            current = {}
+            current['date'] = time
+            current['id_tx'] = json['prev_out']['tx_index']
+            current['value'] = json['prev_out']['value']
+            tx_filter.append(current)
     return tx_filter
 
 
@@ -91,10 +90,9 @@ def add_historical_tx(historicalDataset):
             "id_tx": data['id_tx'],
             "type": "historical"
         }
-        for data in historicalDataset[0:1]
+        for data in historicalDataset
     ]
-    if (len(actions) > 0):
-        helpers.bulk(connections.get_connection(), actions)
+    helpers.bulk(connections.get_connection(), actions)
 
 def unroll(gen):
     for items in gen:
@@ -112,33 +110,13 @@ def filter_listeBlocks(blocks):
 
 def insert_historical_tx(start, end, conf):
     connections.create_connection(hosts=conf['hosts'])
-    # TODO dev do your work!
-    logging.info("deleting index")
-    try:
-        eraseData("bitcoin_tx")
-    except:
-        pass
-
-    logging.info("fetching all block between {start} and {end}".format(start=start, end=end))
+    eraseData()
     list_blocks_2dates = getListBlocks_between2dates(start,end)
     list_hash_tx = filter_listeBlocks(list_blocks_2dates)
     for block in list_hash_tx:
-        logging.info("adding volumes for block : {block}".format(block=block))
-        blks = getList_txBlock(block['id_block'])
-        if 'tx' in blks.keys():
-            tx = blks['tx']
+        tx = getList_txBlock(block['id_block'])['tx']
         hist_tx = filter_tx(tx)
         add_historical_tx(hist_tx)
 
 if __name__ == "__main__":
-    import logging
-    import sys
-
-    logging.basicConfig(level=logging.DEBUG)
-    if len(sys.argv) > 2:
-        startDate = sys.argv[1]
-        endDate = sys.argv[2]
-        logging.info("Starting volume insertion from {start} to {end}".format(start=startDate, end=endDate))
-        insert_historical_tx(startDate, endDate, {"hosts": ["db"]})
-    else:
-        print("missing argument !")
+    insert_historical_tx("2018-01-01", "2018-03-22", {"hosts": ["localhost"]})
