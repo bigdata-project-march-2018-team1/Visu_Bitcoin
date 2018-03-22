@@ -28,7 +28,6 @@ def eraseData(t, ind="bitcoin"):
     print(response)
 
 def main():
-    
     # Defines a default Elasticsearch client
     connections.create_connection(hosts=['localhost'])
 

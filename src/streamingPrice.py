@@ -10,8 +10,7 @@ def send(rdd):
     if data_tx:
         date=data_tx[0][0]
         value=data_tx[0][1]
-        print (date, value)
-        connections.create_connection(hosts=['localhost'])
+        connections.create_connection(hosts=[host])
         storeData(date, float(value), "real-time")
 
 def streamingPrice(master="local[2]", appName="CurrentPrice" , hostname="localhost", port=9002):
@@ -36,8 +35,6 @@ def streamingPrice(master="local[2]", appName="CurrentPrice" , hostname="localho
     words.pprint()
 
     ssc.start()
-    #ssc.stop(stopSparkContext=True, stopGraceFully=False)
-
     ssc.awaitTermination()
     #ssc.stop()
     #ssc.stop(stopSparkContext=True, stopGraceFully=False)

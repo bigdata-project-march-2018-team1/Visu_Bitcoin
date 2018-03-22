@@ -22,5 +22,5 @@ def testCreateCurrentDataset():
 def testCreateHistoricalDataset():
     jsonData = { 'bpi': {"2018-01-04":15155.2263} }
     for val in createHistoricalDataset(jsonData):
-        assert val['date'] == "2018-01-04"
+        assert val['date'] == "2018-01-04T23:59:00"
         assert val['value'] == 15155.2263

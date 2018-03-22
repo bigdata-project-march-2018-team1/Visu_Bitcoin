@@ -9,4 +9,14 @@ install:
 # testing
 script:
     - echo "Test begin!!"
-    - bash test.sh
+    - pytest test/testBitcoinPrice.py
+
+deploy:
+  provider: pypi
+  user: ounes
+  distributions: sdist bdist_wheel
+  password:
+    secure: "poiuyt123456"
+  on:
+    tags: true
+    repo: bigdata-project-march-2018-team1/Visu_Bitcoin
