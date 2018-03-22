@@ -21,7 +21,7 @@ def storeData(d, v, t):
     b=BitCoin(date=d,value=v,type=t)
     b.save()
 
-def eraseData(index):
+def eraseData(index="bitcoin"):
     """ Erase date in the database """
     s = Search(index=index).query("match", _index=index)
     response = s.delete()

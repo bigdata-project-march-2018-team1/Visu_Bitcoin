@@ -21,11 +21,9 @@ def callLogger(fn, *arg):
 def streamFunc():
     print("TODO call func")
 
-callLogger(batchFunc, config)
+#callLogger(batchFunc, config)
 
-producer = Thread(target=produce_stream_current)
-producer.start()
-while(True):
-    callLogger(streamFunction, config)
-    time.sleep(60)
+# producer = Thread(target=produce_stream_current)
+# producer.start()
+callLogger(streamFunction, config)
 

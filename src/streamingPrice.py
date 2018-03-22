@@ -14,20 +14,20 @@ def send(rdd, host='localhost'):
         connections.create_connection(hosts=[host])
         storeData(date, float(value), "real-time")
 
-def streamingPrice(master="local[2]", appName="CurrentPrice" , hostname="localhost", port=9002):
+def streamingPrice(master="local[2]", appName="CurrentPrice" , producer_host="localhost", db_host="localhost", port=9002):
     """
     Create a streaming who listening in hostname:port, get a text from a socket server and print it every 60 secondes.
     """
     sc = SparkContext(master ,appName)
     ssc = StreamingContext(sc, 60)
 
-    dstream = ssc.socketTextStream(hostname, port)
+    dstream = ssc.socketTextStream(producer_host, port)
     lines = dstream.map(lambda line: line.strip("{}"))\
         .map(lambda str: str.split(","))\
         .map(lambda line: (line[0].split(":",1)[1].strip('\" '), line[1].split(":")[1].strip('\" ')))\
         .map(lambda tuple: (tuple[0].split("+")[0],tuple[1]))
 
-    lines.foreachRDD(lambda rdd: send(rdd, host=hostname))
+    lines.foreachRDD(lambda rdd: send(rdd, host=db_host))
 
     ssc.start()
 
@@ -35,7 +35,7 @@ def streamingPrice(master="local[2]", appName="CurrentPrice" , hostname="localho
     #ssc.stop()
 
 def streamingPriceDict(conf):
-    streamingPrice(hostname=conf['hostname'])
+    streamingPrice(db_host=conf['hostname'])
 
 if __name__ == "__main__":
     streamingPrice()

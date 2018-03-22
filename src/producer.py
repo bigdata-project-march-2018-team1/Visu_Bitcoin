@@ -1,0 +1,2 @@
+from produce_stream_current_price import produce_stream_current
+produce_stream_current()
