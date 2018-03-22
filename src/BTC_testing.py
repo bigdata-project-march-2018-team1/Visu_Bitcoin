@@ -78,4 +78,6 @@ def insertHistoricalDataInBase(conf):
     add_historical_data("2010-07-17","2018-03-20")
 
 if __name__ == "__main__":
-    insertHistoricalDataInBase({"hosts": ["localhost"]})
+    #insertHistoricalDataInBase({"hosts": ["localhost"]})
+    connections.create_connection(hosts='localhost')
+    storeData("2010-02-23",2654.23,'real-time')
