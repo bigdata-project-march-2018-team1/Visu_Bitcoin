@@ -4,8 +4,7 @@ from elasticsearch_dsl.connections import connections
 from elasticsearch import Elasticsearch
 from elasticsearch import helpers
 import json
-import pprint 
-
+import logging
 from elastic_storage import storeData, eraseData, BitCoin
 
 DEFAULT_HOST = "api.coindesk.com"
@@ -52,22 +51,24 @@ def createCurrentDataset(jsonDataStream):
 
 def add_historical_data(start, end):
     ''' Get data from the API between two dates '''
-    eraseData() 
+    # TODO use head request
+    try:
+        eraseData()
+    except:
+        logging.info("no data to erase! :(")
     jsonDataH = getDatePrice(start,end)
     historicalDataset = createHistoricalDataset(jsonDataH)
-#    for val in historicalDataset:
-#        storeData(val)
 
     '''call to bulk api to store the data'''
     actions=[
-    {
-    "_index": "bitcoin",
-    "_type": "doc",
-    "date": data['date'],
-    "value": data['value']
-    }
-  for data in historicalDataset
-]
+      {
+        "_index": "bitcoin",
+        "_type": "doc",
+        "date": data['date'],
+        "value": data['value']
+      }
+      for data in historicalDataset
+    ]
     helpers.bulk(connections.get_connection(), actions)
 
 def insertHistoricalDataInBase(conf):
