@@ -68,14 +68,15 @@ def getList_txBlock(block, host=DEFAULT_HOST, path=URI_TRANSACTIONS):
 
 def filter_tx(data):
     tx_filter = []
-    for js in data[1:]:
-        time = datetime.datetime.fromtimestamp(js['time']).strftime('%Y-%m-%dT%H:%M:%S')
-        for json in js['inputs']:
-            current = {}
-            current['date'] = time
-            current['id_tx'] = json['prev_out']['tx_index']
-            current['value'] = json['prev_out']['value']
-            tx_filter.append(current)
+    for js in data:
+        if "inputs" in js.keys():
+            time = datetime.datetime.fromtimestamp(js['time']).strftime('%Y-%m-%dT%H:%M:%S')
+            for json in js['inputs']:
+                current = {}
+                current['date'] = time
+                current['id_tx'] = json['prev_out']['tx_index']
+                current['value'] = json['prev_out']['value']
+                tx_filter.append(current)
     return tx_filter
 
 
@@ -123,7 +124,9 @@ def insert_historical_tx(start, end, conf):
     list_hash_tx = filter_listeBlocks(list_blocks_2dates)
     for block in list_hash_tx:
         logging.info("adding volumes for block : {block}".format(block=block))
-        tx = getList_txBlock(block['id_block'])['tx']
+        blks = getList_txBlock(block['id_block'])
+        if 'tx' in blks.keys():
+            tx = blks['tx']
         hist_tx = filter_tx(tx)
         add_historical_tx(hist_tx)
 
