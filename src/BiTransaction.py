@@ -27,6 +27,19 @@ ES_INDEX = "bitcoin_tx"
 ES_SUBTYPE = "historical"
 
 def getListBlocks_1day(date, host = DEFAULT_HOST, uri = URI_BLOCKS):
+    """Get blocks information for a date
+    
+    Arguments:
+        date {[string]} -- [date]
+    
+    Keyword Arguments:
+        host {[string]} -- [API host] (default: {DEFAULT_HOST})
+        uri {[string]} -- [API uri] (default: {URI_BLOCKS})
+    
+    Returns:
+        [dic] -- [dictionnary contains blocks information]
+    """
+
     timestemp = int(time.mktime(datetime.datetime.strptime(date, "%Y-%m-%d").timetuple()))*1000
     path = uri + str(timestemp) + "?format=json"
     connection = httpClient.HTTPConnection(host)
@@ -39,21 +52,52 @@ def getListBlocks_1day(date, host = DEFAULT_HOST, uri = URI_BLOCKS):
     return result
 
 def dateToDateTime(date):
+    """ Convert string date to timestamp date
+    
+    Arguments:
+        date {string} -- date
+    
+    Returns:
+        timestamp -- date
+    """
     timestemp = int(time.mktime(datetime.datetime.strptime(date, "%Y-%m-%d").timetuple()))
     return datetime.datetime.fromtimestamp(timestemp)
 
 def getListBlocks_between2dates(start, end, host = DEFAULT_HOST, uri = URI_BLOCKS):
+    """Get blocks information between two dates
+    
+    Arguments:
+        start {[string]} -- [date start]
+        end {[string]} -- [date start]
+    
+    Keyword Arguments:
+        host {[string]} -- [API host] (default: {DEFAULT_HOST})
+        uri {[string]} -- [API uri] (default: {URI_BLOCKS})
+    
+    Returns:
+        [dic] -- [dictionnary contains blocks information]
+    """
+
     blocks_list = []
     blocks_list.append(getListBlocks_1day(start))
     start_datetime = dateToDateTime(start)
     current_dateTime = start_datetime + td(days=1)
-    end_timestemp = dateToDateTime(end)
-    while current_dateTime != end_timestemp:
+    end_datetime = dateToDateTime(end)
+    while current_dateTime <= end_datetime:
         blocks_list.append(getListBlocks_1day(current_dateTime.strftime('%Y-%m-%d')))
         current_dateTime += td(days=1)
     return blocks_list
 
 def filterHash_listBlocks(listBlocks):
+    """ Filter blocks information to keep hash only
+    
+    Arguments:
+        listBlocks {list} -- [description of blocks]
+    
+    Returns:
+        [type] -- [hash blocks list]
+    """
+
     res = []
     for js in listBlocks['blocks']:
         currentblock = {}
@@ -62,6 +106,19 @@ def filterHash_listBlocks(listBlocks):
     return res
 
 def getList_txBlock(block, host=DEFAULT_HOST, path=URI_TRANSACTIONS):
+    """ Get all informations transaction for a hash block
+    
+    Arguments:
+        block {string} -- [hash block]
+    
+    Keyword Arguments:
+        host {[string]} -- [API host] (default: {DEFAULT_HOST})
+        path {[string]} -- [API path] (default: {URI_TRANSACTIONS})
+    
+    Returns:
+        [list] -- [all informations transaction]
+    """
+
     connection = httpClient.HTTPConnection(host)
     connection.request("GET", path + block)
     resp = connection.getresponse()
@@ -72,15 +129,25 @@ def getList_txBlock(block, host=DEFAULT_HOST, path=URI_TRANSACTIONS):
     return result
 
 def filter_tx(data):
+    """ Filter of transactions information to keep only date, identification and value
+    
+    Arguments:
+        data {[list]} -- [all informations transaction]
+    
+    Returns:
+        [list] -- [transactions date, identification and value for a block]
+    """
+
     tx_filter = []
-    for js in data[1:]:
-        time = datetime.datetime.fromtimestamp(js['time']).strftime('%Y-%m-%dT%H:%M:%S')
-        for json in js['inputs']:
-            current = {}
-            current['date'] = time
-            current['id_tx'] = json['prev_out']['tx_index']
-            current['value'] = json['prev_out']['value']
-            tx_filter.append(current)
+    for js in data:
+        if 'inputs' in js.keys():
+            time = datetime.datetime.fromtimestamp(js['time']).strftime('%Y-%m-%dT%H:%M:%S')
+            for json in js['inputs']:
+                current = {}
+                current['date'] = time
+                current['id_tx'] = json['prev_out']['tx_index']
+                current['value'] = json['prev_out']['value']
+                tx_filter.append(current)
     return tx_filter
 
 
