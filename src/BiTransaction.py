@@ -2,6 +2,8 @@ import json
 import pprint
 import time
 import datetime
+import logging
+
 from http import client as httpClient
 from http import HTTPStatus
 from elasticsearch_dsl.connections import connections
@@ -82,8 +84,13 @@ def getListBlocks_between2dates(start, end, host = DEFAULT_HOST, uri = URI_BLOCK
     blocks_list.append(getListBlocks_1day(start))
     start_datetime = dateToDateTime(start)
     current_dateTime = start_datetime + td(days=1)
+<<<<<<< HEAD
     end_datetime = dateToDateTime(end)
     while current_dateTime <= end_datetime:
+=======
+    end_timestemp = dateToDateTime(end)
+    while current_dateTime < end_timestemp:
+>>>>>>> a31dd571e97a2d0b7c938bd1e15b0e3b47a7e6e1
         blocks_list.append(getListBlocks_1day(current_dateTime.strftime('%Y-%m-%d')))
         current_dateTime += td(days=1)
     return blocks_list
@@ -196,6 +203,11 @@ def insert_historical_tx(start, end, conf):
         add_historical_tx(hist_tx)
 
 if __name__ == "__main__":
-    import logging
+    from sys import argv
+
     logging.basicConfig(level=logging.INFO)
-    insert_historical_tx("2018-01-01", "2018-03-22", {"hosts": ["db"]})
+
+    start_date = argv[0]
+    end_date = argv[1]
+
+    insert_historical_tx(start_date, end_date, {"hosts": ["db"]})
