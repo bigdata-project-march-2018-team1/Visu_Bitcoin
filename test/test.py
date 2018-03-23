@@ -1,0 +1,3 @@
+
+
+bpi.getCurrentPrice()

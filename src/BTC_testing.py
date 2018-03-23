@@ -1,11 +1,9 @@
 from http import client as httpClient
 from http import HTTPStatus
 from elasticsearch_dsl.connections import connections
-from elasticsearch import Elasticsearch
 from elasticsearch import helpers
 import json
-import pprint 
-
+import logging
 from elastic_storage import storeData, eraseData, BitCoin
 
 DEFAULT_HOST = "api.coindesk.com"
@@ -23,8 +21,9 @@ def getCurrentPrice(host = DEFAULT_HOST, path = DEFAULT_URI):
     return result
 
 def getDatePrice(start, end, host = DEFAULT_HOST, path = DEFAULT_URI):
+    ''' Call the API to get all the bitcoin values between two dates '''
     connection = httpClient.HTTPConnection(host)
-    path = "/v1/bpi/historical/EUR.json?start="+start+"&end="+end
+    path = "/v1/bpi/historical/close.json?currency=EUR&start="+start+"&end="+end
     connection.request("GET", path)
     resp = connection.getresponse()
     result = {}
@@ -39,7 +38,6 @@ def createHistoricalDataset(jsonData):
     for key,val in jsonData['bpi'].items():
         tempDic = {}
         tempDic['date'] = key+"T23:59:00"
-        #print(tempDic['date'])
         tempDic['value'] = val
         list.append(tempDic)
     return list
@@ -52,22 +50,25 @@ def createCurrentDataset(jsonDataStream):
 
 def add_historical_data(start, end):
     ''' Get data from the API between two dates '''
-    eraseData() 
+    # TODO use head request
+    try:
+        eraseData("historical")
+    except:
+        logging.info("no data to erase! :(")
     jsonDataH = getDatePrice(start,end)
     historicalDataset = createHistoricalDataset(jsonDataH)
-#    for val in historicalDataset:
-#        storeData(val)
 
-    '''call to bulk api to store the data'''
+    ''' Call to bulk api to store the data '''
     actions=[
-    {
-    "_index": "bitcoin",
-    "_type": "doc",
-    "date": data['date'],
-    "value": data['value']
-    }
-  for data in historicalDataset
-]
+      {
+        "_index": "bitcoin",
+        "_type": "doc",
+        "date": data['date'],
+        "value": data['value'],
+        "type": "historical"
+      }
+      for data in historicalDataset
+    ]
     helpers.bulk(connections.get_connection(), actions)
 
 def insertHistoricalDataInBase(conf):
@@ -75,7 +76,9 @@ def insertHistoricalDataInBase(conf):
     connections.create_connection(hosts=conf['hosts'])
    
     ''' Puts the historical data into elasticsearch '''
-    add_historical_data("2010-07-17","2018-03-20")
+    add_historical_data("2010-07-17","2018-03-22")
 
 if __name__ == "__main__":
-    insertHistoricalDataInBase({"hosts": ["localhost"]})
+    #insertHistoricalDataInBase({"hosts": ["localhost"]})
+    connections.create_connection(hosts='localhost')
+    storeData("2010-02-23",2654.23,'real-time')
