@@ -202,7 +202,7 @@ if __name__ == "__main__":
 
     logging.basicConfig(level=logging.INFO)
 
-    start_date = argv[0]
-    end_date = argv[1]
+    start_date = argv[1]
+    end_date = argv[2]
 
-    insert_historical_tx(start_date, end_date, {"hosts": ["db"]})
+    insert_historical_tx(str(start_date), str(end_date), {"hosts": ["db"]})
