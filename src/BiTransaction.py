@@ -84,13 +84,8 @@ def getListBlocks_between2dates(start, end, host = DEFAULT_HOST, uri = URI_BLOCK
     blocks_list.append(getListBlocks_1day(start))
     start_datetime = dateToDateTime(start)
     current_dateTime = start_datetime + td(days=1)
-<<<<<<< HEAD
     end_datetime = dateToDateTime(end)
     while current_dateTime <= end_datetime:
-=======
-    end_timestemp = dateToDateTime(end)
-    while current_dateTime < end_timestemp:
->>>>>>> a31dd571e97a2d0b7c938bd1e15b0e3b47a7e6e1
         blocks_list.append(getListBlocks_1day(current_dateTime.strftime('%Y-%m-%d')))
         current_dateTime += td(days=1)
     return blocks_list
