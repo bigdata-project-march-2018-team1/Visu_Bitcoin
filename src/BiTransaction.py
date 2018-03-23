@@ -145,10 +145,11 @@ def filter_tx(data):
         if 'inputs' in js.keys():
             time = datetime.datetime.fromtimestamp(js['time']).strftime('%Y-%m-%dT%H:%M:%S')
             for json in js['inputs']:
-                current = {}
-                current['date'] = time
-                current['id_tx'] = json['prev_out']['tx_index']
-                current['value'] = json['prev_out']['value']
+                if 'prev_out' in json.keys():
+                    current = {}
+                    current['date'] = time
+                    current['id_tx'] = json['prev_out']['tx_index']
+                    current['value'] = json['prev_out']['value']
                 tx_filter.append(current)
     return tx_filter
 
