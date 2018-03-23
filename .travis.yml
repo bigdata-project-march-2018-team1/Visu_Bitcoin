@@ -1,6 +1,6 @@
 language: python
 python:
-    - "3.6"
+    - "3.5"
 
 # dependencies install
 install:
@@ -8,4 +8,15 @@ install:
 
 # testing
 script:
-    - echo "placeholder insert test here!"
+    - echo "Test begin!!"
+    - pytest test/testBitcoinPrice.py
+
+deploy:
+  provider: pypi
+  user: ounes
+  distributions: sdist bdist_wheel
+  password:
+    secure: "poiuyt123456"
+  on:
+    tags: true
+    repo: bigdata-project-march-2018-team1/Visu_Bitcoin
