@@ -150,7 +150,7 @@ def filter_tx(data):
                     current['date'] = time
                     current['id_tx'] = json['prev_out']['tx_index']
                     current['value'] = json['prev_out']['value']
-                tx_filter.append(current)
+                    tx_filter.append(current)
     return tx_filter
 
 
