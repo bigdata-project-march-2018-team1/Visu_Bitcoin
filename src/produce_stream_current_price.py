@@ -22,7 +22,7 @@ def send_to_spark(current, tcp_connection,s):
         print("Connection failed!")
         print("Waiting for a new TCP connection...")
         time.sleep(10)
-        conn, addr = s.accept()
+        conn, _ = s.accept()
         send_to_spark(current,conn,s)
         print("Connected... Starting getting current price.")
 
@@ -40,7 +40,7 @@ def produce_stream_current(tcp_ip = "localhost",tcp_port = 9002):
     s.bind((tcp_ip, tcp_port))
     s.listen(1)
     print("Waiting for TCP connection...")
-    conn, addr = s.accept()
+    conn, _ = s.accept()
     print("Connected... Starting getting current price.")
     while True:
         time.sleep(10)
