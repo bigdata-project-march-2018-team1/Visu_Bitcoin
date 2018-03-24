@@ -9,7 +9,8 @@ install:
 # testing
 script:
     - echo "Test begin!!"
-    - pytest test/testBitcoinPrice.py
+    - pytest test/testBPI.py
+    - pytest test/testBTI.py
 
 deploy:
   skip_cleanup: true
