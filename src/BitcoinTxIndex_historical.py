@@ -109,7 +109,7 @@ def filterHash_listBlocks(listBlocks):
     """
 
     res = []
-    for js in listBlocks[1]:
+    for js in listBlocks['blocks']:
         currentblock = {}
         currentblock['id_block'] = js['hash']
         res.append(currentblock)

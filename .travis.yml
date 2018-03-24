@@ -12,11 +12,9 @@ script:
     - pytest test/testBitcoinPrice.py
 
 deploy:
-  provider: pypi
-  user: ounes
-  distributions: sdist bdist_wheel
-  password:
-    secure: "poiuyt123456"
+  skip_cleanup: true
+  provider: script
+  script: ./deploy.sh
   on:
-    tags: true
-    repo: bigdata-project-march-2018-team1/Visu_Bitcoin
+    branch: master
+    python: '3.5'
