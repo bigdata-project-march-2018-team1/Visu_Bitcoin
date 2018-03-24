@@ -5,7 +5,7 @@ import time
 import random
 from json import JSONEncoder
 
-from BTC_testing import getCurrentPrice,createCurrentDataset
+from BitcoinPriceIndex_historical import getCurrentPrice,createCurrentDataset
 
 conn=None
 
@@ -22,7 +22,7 @@ def send_to_spark(current, tcp_connection,s):
         print("Connection failed!")
         print("Waiting for a new TCP connection...")
         time.sleep(10)
-        conn, addr = s.accept()
+        conn, _ = s.accept()
         send_to_spark(current,conn,s)
         print("Connected... Starting getting current price.")
 
@@ -30,17 +30,17 @@ def produce_stream_current(tcp_ip = "localhost",tcp_port = 9002):
     """
     Create a socket who listening in hostname:port and send the current price to SparkStreaming client.
     """
-
     global conn
     conn = None
+
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-
     s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-
     s.bind((tcp_ip, tcp_port))
     s.listen(1)
+
     print("Waiting for TCP connection...")
-    conn, addr = s.accept()
+    conn, _ = s.accept()
+    
     print("Connected... Starting getting current price.")
     while True:
         time.sleep(10)

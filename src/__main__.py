@@ -3,9 +3,11 @@
 import logging
 from threading import Thread
 
-from BTC_testing import insertHistoricalDataInBase as batchFunc 
-from streamingPrice import streamingPriceDict as streamFunction
-from produce_stream_current_price import produce_stream_current
+from pyspark import SparkContext
+from BitcoinPriceIndex_historical import insertHistoricalDataInBase as batchFunc 
+from BitcoinPriceIndex_streamingConsumer import streamingPriceDict as streamFunction
+from BitcoinPriceIndex_streamingProducer import produce_stream_current
+from BitcoinTxIndex_streaming import insert_real_time_tx
 
 from config import config
 
@@ -21,6 +23,11 @@ def streamFunc():
 
 callLogger(batchFunc, config)
 
-producer = Thread(target=produce_stream_current)
-producer.start()
+sc = SparkContext(master="local[2]",appName="Bitcoin Transactions Real-time")
+producer_tx = Thread(target=insert_real_time_tx(sc, config))
+producer_tx.start()
+
+producer_price = Thread(target=produce_stream_current)
+producer_price.start()
+
 callLogger(streamFunction, config)
