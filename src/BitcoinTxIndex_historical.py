@@ -109,7 +109,7 @@ def filterHash_listBlocks(listBlocks):
     """
 
     res = []
-    for js in listBlocks['blocks']:
+    for js in listBlocks[1]:
         currentblock = {}
         currentblock['id_block'] = js['hash']
         res.append(currentblock)
@@ -151,7 +151,7 @@ def filter_tx(data):
     for json_tx in data:
         if 'inputs' in json_tx.keys():
             time = datetime.datetime.fromtimestamp(
-                int(json_tx['time'])).strftime('%Y-%m-%dT%H:%M:%S')
+                int(json_tx['time'])).strftime("%Y-%m-%d"'T'"%H:%M:%S")
             for json_inputs in json_tx['inputs']:
                 if 'prev_out' in json_inputs.keys():
                     current = {}
@@ -169,10 +169,12 @@ def add_historical_tx(historicalDataset):
         {
             "_index": "bitcoin_tx",
             "_type": "doc",
-            "date": data['date'],
-            "value": data['value'],
-            "id_tx": data['id_tx'],
-            "type": "historical"
+            "_source": {
+                "type": "historical",
+                "value": data['value'],
+                "time": {'path': data['date'], 'format':'%Y-%m-%dT%H:%M:%S'},
+                "id_tx": data['id_tx']
+            }
         }
         for data in historicalDataset
     ]

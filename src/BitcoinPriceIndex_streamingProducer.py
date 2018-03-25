@@ -40,13 +40,10 @@ def produce_stream_current(tcp_ip = "localhost",tcp_port = 9002):
 
     print("Waiting for TCP connection...")
     conn, _ = s.accept()
-<<<<<<< HEAD:src/BitcoinPriceIndex_streamingProducer.py
     
-=======
->>>>>>> b6370c8b37fc94dfe0cfb5dbed706bc8cc73bc67:src/produce_stream_current_price.py
     print("Connected... Starting getting current price.")
     while True:
-        time.sleep(10)
+        time.sleep(50)
         last_current = createCurrentDataset(getCurrentPrice())
         send_to_spark(last_current,conn,s)
 

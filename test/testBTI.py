@@ -26,7 +26,7 @@ def teststringToDatetime():
     assert stringToDatetime(date) == datetime.datetime(2012, 1, 1)
 
 def testFilterHash_listBlocks():
-    listBlocks = {'blocks': [{'hash': 'unit_test'}]}
+    listBlocks = ['blocks', [{'hash': 'unit_test'}]]
     assert filterHash_listBlocks(listBlocks) == [{'id_block': 'unit_test'}]
 
 def testFilter_tx():

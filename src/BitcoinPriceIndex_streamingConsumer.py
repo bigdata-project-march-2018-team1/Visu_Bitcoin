@@ -17,7 +17,7 @@ def streamingPrice(master="local[2]", appName="CurrentPrice" , producer_host="lo
     Create a streaming who listening in hostname:port, get a text from a socket server and print it every 60 secondes.
     """
     sc = SparkContext(master, appName)
-    strc = StreamingContext(sc, 10)
+    strc = StreamingContext(sc, 50)
     dstream = strc.socketTextStream(producer_host, port)
     dstream_map = dstream.map(lambda line: line.strip("{}"))\
                         .map(lambda str: str.split(","))\
@@ -35,4 +35,4 @@ def streamingPriceDict(conf):
     streamingPrice(db_host=conf['hosts'][0])
 
 if __name__ == "__main__":
-    streamingPrice()
+    streamingPrice(db_host="localhost")

@@ -2,7 +2,7 @@ from websocket import create_connection
 import datetime
 import json
 from elasticsearch_dsl.connections import connections
-from elasticsearch import helpers
+from elasticsearch import helpers, Elasticsearch
 
 from elastic_storage import eraseData
 
@@ -16,7 +16,7 @@ def filter_tx(data):
         for json in data['inputs']:
             if 'prev_out' in json.keys():
                 current = {}
-                current['date'] = time
+                current['date'] = str(time)
                 current['id_tx'] = json['prev_out']['tx_index']
                 current['value'] = json['prev_out']['value']/100000000
                 tx_filter.append(current)
@@ -30,10 +30,12 @@ def add_real_time_tx(realTimeData, conf):
         {
             "_index": "bitcoin_tx",
             "_type": "doc",
-            "value": data['value'],
-            "date": data['date'],
-            "id_tx": data['id_tx'],
-            "type": "streaming"
+            "_source":{
+                "type": "real-time",
+                "value": data['value'],
+                "time": {'path': data['date'], 'format':'%Y-%m-%dT%H:%M:%S'},
+                "id_tx": data['id_tx']
+            }
         }
         for data in realTimeData
     ]
@@ -51,6 +53,7 @@ def getRealTimeTx(sc):
 
 def insert_real_time_tx(sc, conf):
     connections.create_connection(hosts=conf['hosts'])
+    #eraseData("real-time", "bitcoin_tx")
     while True:
         rdd = getRealTimeTx(sc)
         print(rdd)

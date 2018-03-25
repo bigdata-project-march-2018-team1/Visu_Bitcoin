@@ -10,7 +10,7 @@ class BitCoin(DocType):
     type=Text
     
     class Meta:
-        index = 'bitcoin'
+        index = 'bitcoin_price'
     
     def save(self, ** kwargs):
         return super().save(** kwargs)
@@ -21,7 +21,7 @@ def storeData(d, v, t):
     b=BitCoin(date=d,value=v,type=t)
     b.save()
 
-def eraseData(typ, ind="bitcoin"):
+def eraseData(typ, ind="bitcoin_price"):
     """ Erase data in the database by taking 2 args : type and index"""
     s = Search(index=ind).query("match", type=typ)
     response = s.delete()
