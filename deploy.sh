@@ -2,7 +2,7 @@
 
 # on lit GIT_DEPLOY_REPO ou si y‘a pas on tente le package.json repository field
 # (il faut une string et pas un objet dans ce cas)
-#GIT_DEPLOY_REPO=${GIT_DEPLOY_REPO:-$(python -e 'process.stdout.write(require("./package.json").repository)')}
+GIT_DEPLOY_REPO=${GIT_DEPLOY_REPO:-$(python -e 'process.stdout.write(require("./package.json").repository)')}
 
 # on se déplace dans le dossier de build
 cd Visu_Bitcoin && \
