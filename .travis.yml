@@ -1,6 +1,12 @@
 language: python
+services: 
+    - docker
 python:
     - "3.5"
+
+# variables d'environnement
+env:
+    - DOCKER_COMPOSE_VERSION=1.8.0
 
 # dependencies install
 install:
@@ -12,10 +18,20 @@ script:
     - pytest test/testBPI.py
     - pytest test/testBTI.py
 
+after_success:
+    - export SSHPASS=testing
+    - sshpass -e ssh sandbox@51.15.196.143:22
+
+before_install:
+  - sudo rm /usr/local/bin/docker-compose
+  - curl -L https://github.com/docker/compose/releases/download/${DOCKER_COMPOSE_VERSION}/docker-compose-`uname -s`-`uname -m` > docker-compose
+  - chmod +x docker-compose
+  - sudo mv docker-compose /usr/local/bin
+
 deploy:
   skip_cleanup: true
   provider: script
   script: ./deploy.sh
   on:
-    branch: master
+    branch: integration
     python: '3.5'
