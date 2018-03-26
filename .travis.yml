@@ -7,8 +7,8 @@ install:
 - pip install -r requirements.txt
 script:
 - echo "Test begin!!"
-- pytest test/testBPI.py
-- pytest test/testBTI.py
+- pytest app/test/testBPI.py
+- pytest app/test/testBTI.py
 addons:
   ssh_known_hosts: 51.15.196.143
 before_deploy:
