@@ -1,3 +1,4 @@
-cat ./test.txt
-# docker-compose build app
-# docker-compose up
+cd app
+git pull
+cd -
+docker-compose up
