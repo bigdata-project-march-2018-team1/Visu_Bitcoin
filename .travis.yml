@@ -31,7 +31,7 @@ after_success:
 deploy:
   skip_cleanup: true
   provider: script
-  script: deploy.sh
+  script: bash ./deploy.sh
   on:
     branch: integration
     python: '3.5'
