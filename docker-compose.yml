@@ -6,6 +6,7 @@ services:
         networks:
             - backend
         volumes:
+            # TODO remove this in production!
             - ./app:/app/
         depends_on:
             - db
