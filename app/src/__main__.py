@@ -23,9 +23,9 @@ def streamFunc():
 
 callLogger(batchFunc, config)
 
-sc = SparkContext(master="local[2]",appName="Bitcoin Transactions Real-time")
-producer_tx = Thread(target=insert_real_time_tx, args=[sc, config])
-producer_tx.start()
+#sc = SparkContext(master="local[2]",appName="Bitcoin Transactions Real-time")
+#producer_tx = Thread(target=insert_real_time_tx, args=[sc, config])
+#producer_tx.start()
 
 producer_price = Thread(target=produce_stream_current)
 producer_price.start()
