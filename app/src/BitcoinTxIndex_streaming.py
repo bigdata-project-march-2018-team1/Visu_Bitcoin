@@ -30,11 +30,11 @@ def add_real_time_tx(realTimeData, conf):
         {
             "_index": "bitcoin_tx",
             "_type": "doc",
+            "_id": data['id_tx'],
             "_source":{
                 "type": "real-time",
                 "value": data['value'],
-                "time": {'path': data['date'], 'format':'%Y-%m-%dT%H:%M:%S'},
-                "id_tx": data['id_tx']
+                "time": {'path': data['date'], 'format':'%Y-%m-%dT%H:%M:%S'}
             }
         }
         for data in realTimeData
