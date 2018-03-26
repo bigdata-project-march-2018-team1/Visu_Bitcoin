@@ -23,6 +23,5 @@ deploy:
     branch: develop
     python: '3.5'
 before_install:
-- openssl aes-256-cbc -K $encrypted_a710b40432a9_key -iv $encrypted_a710b40432a9_iv
+- openssl aes-256-cbc -K $encrypted_6d11462a714f_key -iv $encrypted_6d11462a714f_iv
   -in deploy_rsa.enc -out deploy_rsa -d
-
