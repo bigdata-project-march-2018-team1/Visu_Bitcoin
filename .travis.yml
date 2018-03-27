@@ -19,12 +19,13 @@ deploy:
   skip_cleanup: true
   provider: script
   script:
-    - ssh $USERNAME@$DEPLOY_ADDR "cd deploy && git pull"
-    - ssh $USERNAME@$DEPLOY_ADDR "cd deploy && sh ./deploy.sh"
+    - ssh $USERNAME@$DEPLOY_ADDR "git -C $TRAVIS_BRANCH pull $TRAVIS_BRANCH || git clone https://github.com/$TRAVIS_REPO_SLUG $TRAVIS_BRANCH"
+    - ssh $USERNAME@$DEPLOY_ADDR "cd $TRAVIS_BRANCH && sh ./deploy.sh"
   on:
     branch:
+      - master
       - develop
-      - integration
+      - testing
     python: '3.5'
 before_install:
   - openssl aes-256-cbc -K $encrypted_6d11462a714f_key -iv $encrypted_6d11462a714f_iv
