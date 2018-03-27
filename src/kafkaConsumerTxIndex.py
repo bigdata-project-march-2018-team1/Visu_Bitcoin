@@ -3,6 +3,7 @@ from pyspark import SparkContext, SparkConf
 from pyspark.streaming import StreamingContext
 from pyspark.streaming.kafka import KafkaUtils
 import json
+from BitcoinTxIndex_streaming import filter_tx
 
 def get_Tx_Index_from_Kafka(topic):
     con=KafkaConsumer('json-topic',client_id='Evrim',auto_offset_reset='earliest',group_id='Alone In The Dark',value_deserializer=lambda m: json.loads(m.decode('ascii')))
@@ -10,23 +11,14 @@ def get_Tx_Index_from_Kafka(topic):
     for msg in con:
         print(msg)
 
-def filter_tx(data):
-    tx_filter = []
-    if 'inputs' in data.keys():
-        time = datetime.datetime.fromtimestamp(int(data['time'])).strftime('%Y-%m-%dT%H:%M:%S')
-        for json in data['inputs']:
-            if 'prev_out' in json.keys():
-                current = {}
-                current['date'] = str(time)
-                current['id_tx'] = json['prev_out']['tx_index']
-                current['value'] = json['prev_out']['value']/100000000
-                tx_filter.append(current)
-    return tx_filter
+def remplace_to_json_critere(a):
+    return a.replace("\"","&").replace("\'","\"").replace("&","\'")
 
 if __name__ == "__main__":
     print("la")
     con=KafkaConsumer('elasticDB',client_id='consumer',auto_offset_reset='earliest',group_id='Alone In The Dark')
-    con.subscribe(('elasticDB',))
+    #con.subscribe(('elasticDB',))
     for tx in con:
-        #print(filter_tx(tx))
-        print(json.loads(tx.value.decode()))
+        #print(filter_tx(tx.value.decode()))
+        #print(json.loads(tx.value.decode()))
+        print(filter_tx(json.loads(tx.value.decode())['x']))
