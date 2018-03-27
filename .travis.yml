@@ -25,5 +25,9 @@ deploy:
     - ssh $USERNAME@$DEPLOY_ADDR "git -C $TRAVIS_BRANCH pull $TRAVIS_BRANCH || git clone https://github.com/$TRAVIS_REPO_SLUG $TRAVIS_BRANCH"
     - ssh $USERNAME@$DEPLOY_ADDR "cd $TRAVIS_BRANCH && sh ./deploy.sh"
   on:
-    all_branch: true
-    condition: $TRAVIS_BRANCH =~ ^testing|develop|master$
+    # all_branch: true
+    # condition: $TRAVIS_BRANCH =~ ^testing|develop|master$
+    branch:
+      - master
+      - develop
+      - testing
