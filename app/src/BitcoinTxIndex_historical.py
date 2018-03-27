@@ -169,11 +169,11 @@ def add_historical_tx(historicalDataset):
         {
             "_index": "bitcoin_tx",
             "_type": "doc",
+            "_id": data['id_tx'],
             "_source": {
                 "type": "historical",
                 "value": data['value'],
-                "time": {'path': data['date'], 'format':'%Y-%m-%dT%H:%M:%S'},
-                "id_tx": data['id_tx']
+                "time": {'path': data['date'], 'format':'%Y-%m-%dT%H:%M:%S'}
             }
         }
         for data in historicalDataset

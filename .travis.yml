@@ -1,16 +1,17 @@
 language: python
-services:
-- docker
+env:
+- DEPLOY_ADDR=51.15.196.143
+- USERNAME=devel
 python:
 - '3.5'
 install:
-- pip install -r requirements.txt
+- pip install -r ./app/requirements.txt
 script:
 - echo "Test begin!!"
 - pytest app/test/testBPI.py
 - pytest app/test/testBTI.py
 addons:
-  ssh_known_hosts: 51.15.196.143
+  ssh_known_hosts: $DEPLOY_ADDR
 before_deploy:
 - eval "$(ssh-agent -s)"
 - chmod 600 deploy_rsa
@@ -18,9 +19,13 @@ before_deploy:
 deploy:
   skip_cleanup: true
   provider: script
-  script: ssh devel@51.15.196.143 "sh ./deploy.sh"
+  script:
+  - ssh $USERNAME@$DEPLOY_ADDR "cd deploy && git pull"
+  - ssh $USERNAME@$DEPLOY_ADDR "cd deploy && sh ./deploy.sh"
   on:
-    branch: develop
+    branch:
+    - develop
+    - integration
     python: '3.5'
 before_install:
 - openssl aes-256-cbc -K $encrypted_6d11462a714f_key -iv $encrypted_6d11462a714f_iv
