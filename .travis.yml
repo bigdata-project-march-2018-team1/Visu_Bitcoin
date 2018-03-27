@@ -10,9 +10,8 @@ script:
   - echo "Test begin!!"
   - pytest app/test/testBPI.py
   - pytest app/test/testBTI.py
-addons:
-  ssh_known_hosts: $DEPLOY_ADDR
 before_deploy:
+  - echo '|1|mxj5X2h4rWZTRxGupz+V4518y+0=|9gQbixhkNxyjgEPQftTubVILTTo= ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBOgJxYvjQp2kKMvXdifEFBszzN92whFXAyKhMwBUK045Yt+u/Eq7/WG4gKyh05R0npM9QKf6i9lgAVMwoZxrT/Q=' >> $HOME/.ssh/know_hosts
   - openssl aes-256-cbc -K $encrypted_6d11462a714f_key -iv $encrypted_6d11462a714f_iv
     -in deploy_rsa.enc -out deploy_rsa -d
   - eval "$(ssh-agent -s)"
