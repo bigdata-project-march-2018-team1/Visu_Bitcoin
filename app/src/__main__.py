@@ -19,9 +19,6 @@ def callLogger(fn, *arg):
     fn(*arg)
     logging.info("%s end", fn.__name__)
 
-def streamFunc():
-    print("TODO call func")
-
 callLogger(batchFunc, config)
 
 #sc = SparkContext(master="local[2]",appName="Bitcoin Transactions Real-time")

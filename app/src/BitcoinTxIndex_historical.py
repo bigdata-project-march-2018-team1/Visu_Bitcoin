@@ -1,5 +1,4 @@
 import json
-import pprint
 import time
 import datetime
 import logging
@@ -11,6 +10,7 @@ from elasticsearch import Elasticsearch, helpers
 from pyspark import SparkContext
 
 from elastic_storage import eraseData
+from elastic_helper import http_auth
 
 DEFAULT_HOST = "blockchain.info"
 URI_BLOCKS = "/fr/blocks/"
@@ -190,7 +190,7 @@ def insert_historical_tx(sc, start, end, conf):
         conf {dict} -- [description]
     """
 
-    connections.create_connection(hosts=conf['hosts'])
+    connections.create_connection(hosts=conf['elasticsearch']['hosts'], http_auth=http_auth(conf['elasticsearch']))
     list_hash_tx = getListBlocks_2dates(sc, start, end)
     try:
         eraseData("historical", ind="bitcoin_tx")
