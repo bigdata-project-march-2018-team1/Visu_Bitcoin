@@ -1,3 +1,3 @@
-git pull origin develop
-git checkout develop
+
+docker-compose down
 docker-compose up -d
