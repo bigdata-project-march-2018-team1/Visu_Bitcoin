@@ -5,6 +5,16 @@ from elasticsearch_dsl.connections import connections
 from elastic_storage import storeData,BitCoin,eraseData
 
 def send(rdd, host):
+    """
+     Send the rdd, that's an information passed at argument of "send" function, to our elastic database.
+
+    Arguments:
+        rdd {pyspark.RDD} -- [description]
+        host {string} -- [description]
+
+    Returns:
+        [void] -- []
+    """
     data_tx=rdd.collect()
     if data_tx:
         date=data_tx[0][0]
@@ -14,7 +24,16 @@ def send(rdd, host):
 
 def streamingPrice(master="local[2]", appName="CurrentPrice" , producer_host="localhost", db_host="db", port=9002):
     """
-    Create a streaming who listening in hostname:port, get a text from a socket server and print it every 60 secondes.
+    Create a Spark Streaming which listening in hostname:port, get a text from a socket server and then print it and send it to our elastic data base every 60 secondes.
+
+    Arguments:
+        master {string} -- [description]
+        appName {string} -- [description]
+        producer_host {string} -- [description]
+        db_host {string} -- [description]
+        port {int} -- [description]
+    Returns:
+        [void] -- []
     """
     sc = SparkContext(master, appName)
     strc = StreamingContext(sc, 50)
@@ -31,7 +50,7 @@ def streamingPrice(master="local[2]", appName="CurrentPrice" , producer_host="lo
     strc.start()
     strc.awaitTermination()
 
-def streamingPriceDict(conf):   
+def streamingPriceDict(conf):
     streamingPrice(db_host=conf['hosts'][0])
 
 if __name__ == "__main__":

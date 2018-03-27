@@ -12,6 +12,14 @@ conn=None
 def send_to_spark(current, tcp_connection,s):
     """
     Send current price to SparkStreaming and is "client-crush"-proof.
+
+    Arguments:
+        current {string} -- [description]
+        tcp_connection {string} -- [description]
+        s {socket} -- socket of connection
+
+    Returns:
+        [void] -- []
     """
     global conn
     current_json = JSONEncoder().encode(current)
@@ -29,18 +37,25 @@ def send_to_spark(current, tcp_connection,s):
 def produce_stream_current(tcp_ip = "localhost",tcp_port = 9002):
     """
     Create a socket which is listening on hostname:port and send the current price to SparkStreaming client.
+
+    Arguments:
+        tcp_ip {string} -- [description]
+        tcp_port {int} -- [description]
+
+    Returns:
+        [void] -- []
     """
     global conn
     conn = None
 
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+    #s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     s.bind((tcp_ip, tcp_port))
     s.listen(1)
 
     print("Waiting for TCP connection...")
     conn, _ = s.accept()
-    
+
     print("Connected... Starting getting current price.")
     while True:
         time.sleep(50)
