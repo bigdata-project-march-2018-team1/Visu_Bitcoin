@@ -57,17 +57,6 @@ services:
         image: zookeeper:3.4.10
         networks:
             - zookeeper_network
-    db_dump:
-        build:
-            context: elasticdump
-            args:
-                ELASTIC_PASSWORD: $ELASTIC_PASSWORD 
-        networks:
-            - backend
-        depends_on:
-            db:
-                condition: service_healthy
-
 networks:
     frontend:
     backend:
