@@ -5,7 +5,7 @@ config = {
     'elasticsearch': {
         'hosts': ['db'], # TODO put it in elasticsearch_config
         'username': 'elastic',
-        'password': elasticsearch_config.password
+        'password': elastic_config.password
     },
     'logger': {
         'level': logging.INFO
