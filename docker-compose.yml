@@ -22,7 +22,7 @@ services:
             - 9300
         volumes:
             - ./elasticsearch/config/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml:ro
-            - ./elasticsearch/data:/usr/share/elasticsearch/data
+            - es_data:/usr/share/elasticsearch/data
         healthcheck:
           test: ["CMD", "curl", "localhost:9200"]
           interval: 30s
@@ -61,3 +61,5 @@ networks:
     frontend:
     backend:
     zookeeper_network:
+volumes:
+    es_data:
