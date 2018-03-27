@@ -21,9 +21,8 @@ before_deploy:
 deploy:
   skip_cleanup: true
   provider: script
-  script:
-    - ssh $USERNAME@$DEPLOY_ADDR "git -C $TRAVIS_BRANCH pull $TRAVIS_BRANCH || git clone https://github.com/$TRAVIS_REPO_SLUG $TRAVIS_BRANCH"
-    - ssh $USERNAME@$DEPLOY_ADDR "cd $TRAVIS_BRANCH && sh ./deploy.sh"
+  script: ssh $USERNAME@$DEPLOY_ADDR "git -C $TRAVIS_BRANCH pull $TRAVIS_BRANCH || git clone https://github.com/$TRAVIS_REPO_SLUG $TRAVIS_BRANCH && sh ./deploy.sh"
+
   on:
     all_branches: true
     condition: $TRAVIS_BRANCH =~ ^testing|develop|master$
