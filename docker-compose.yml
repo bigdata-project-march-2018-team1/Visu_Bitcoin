@@ -1,4 +1,4 @@
-version: '2'
+version: '2.2'
 services:
     app:
         build:
@@ -9,7 +9,8 @@ services:
             # TODO remove this in production!
             - ./app:/app/
         depends_on:
-            - db
+            db:
+                condition: "service_healthy"
     db:
         image: docker.elastic.co/elasticsearch/elasticsearch-oss:6.2.3
         networks:
@@ -21,6 +22,11 @@ services:
         volumes:
             - ./elasticsearch/config/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml:ro
             - ./elasticsearch/data:/usr/share/elasticsearch/data
+        healthcheck:
+          test: ["CMD", "curl", "localhost:9200"]
+          interval: 30s
+          timeout: 10s
+          retries: 10
     view:
         image: docker.elastic.co/kibana/kibana-oss:6.2.3
         networks:
@@ -32,7 +38,8 @@ services:
         volumes:
             - ./kibana/config/:/usr/share/kibana/config:ro
         depends_on:
-            - db
+            db:
+                condition: service_healthy
 networks:
     frontend:
     backend:
