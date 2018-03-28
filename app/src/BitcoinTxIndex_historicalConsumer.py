@@ -11,6 +11,8 @@ from elasticsearch import Elasticsearch, helpers
 
 from elastic_helper import http_auth
 
+TIME_FORMAT = '%Y-%m-%dT%H:%M:%S'
+
 def add_historical_tx(historicalDataset):
     ''' Get data from the API between two dates '''
     ''' Call to bulk api to store the data '''
@@ -22,7 +24,7 @@ def add_historical_tx(historicalDataset):
             "_source": {
                 "type": "historical",
                 "value": data['value'],
-                "time": {'path': data['date'], 'format':'%Y-%m-%dT%H:%M:%S'}
+                "time": {'path': data['date'], 'format': TIME_FORMAT}
             }
         }
         for data in historicalDataset
@@ -64,18 +66,17 @@ def timestampToDate(timestamp):
         Datetime -- Datetime date
     """
 
-    time = datetime.datetime.fromtimestamp(
-                int(timestamp)).strftime("%Y-%m-%d"'T'"%H:%M:%S")
-    return time
+    return datetime.datetime.fromtimestamp(
+                int(timestamp)).strftime(TIME_FORMAT)
 
-def send(rdd, host_db="localhost"):
+def send(rdd, config):
     """ Send to elastic
     
     Arguments:
         rdd {RDD} -- Data to send to elastic
     
     Keyword Arguments:
-        host_db {str} -- Database host (default: {"localhost"})
+        config {dict} -- Configuration
     """
 
     data_tx = rdd.collect()
@@ -83,7 +84,7 @@ def send(rdd, host_db="localhost"):
         connections.create_connection(hosts=config['elasticsearch']['hosts'], http_auth=http_auth(config['elasticsearch']))
         add_historical_tx(data_tx[0])
 
-def HisticalTx(master="local[2]", appName="Historical Transaction", group_id='Alone-In-The-Dark', topicName='test', producer_host="localhost", producer_port='2181', db_host="db"): 
+def HisticalTx(config, master="local[2]", appName="Historical Transaction", group_id='Alone-In-The-Dark', topicName='test', producer_host="localhost", producer_port='2181', db_host="db"): 
     """ Load data from kafka, filter and send to elastic
     
     Keyword Arguments:
@@ -102,7 +103,7 @@ def HisticalTx(master="local[2]", appName="Historical Transaction", group_id='Al
                         .map(lambda v: ast.literal_eval(v[1]))\
                         .map(filter_tx)
     dstream.foreachRDD(lambda rdd: send(rdd, config))
-    dstream.pprint()
+    
     ssc.start()
     ssc.awaitTermination()
 
