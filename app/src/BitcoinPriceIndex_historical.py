@@ -4,8 +4,10 @@ import logging
 
 from http import client as httpClient
 from http import HTTPStatus
+
 from elasticsearch_dsl.connections import connections
 from elasticsearch import helpers
+
 from elastic_storage import storeData, eraseData, BitCoin
 from elastic_helper import http_auth
 

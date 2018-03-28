@@ -37,7 +37,7 @@ def connectionToAPI(host, path):
     if resp.status == HTTPStatus.OK:
         result = json.loads(resp.read().decode('utf-8'))
     else:
-        #TODO envelopper ce cas dans un Try/Except ???
+        time.sleep(10)
         connectionToAPI(host, path)
     connection.close()
     return result
@@ -153,4 +153,4 @@ def send_to_consumer(start,end,producer):
 
 if __name__ == "__main__":
     producer = KafkaProducer(acks=1,max_request_size=10000000,bootstrap_servers='localhost:9092')
-    send_to_consumer("2018-02-01","2018-02-03",producer)
+    send_to_consumer("2018-01-01","2018-02-01",producer)

@@ -9,7 +9,6 @@ from pyspark.streaming.kafka import KafkaUtils
 from elasticsearch_dsl.connections import connections
 from elasticsearch import Elasticsearch, helpers
 
-
 from elastic_helper import http_auth
 
 def add_historical_tx(historicalDataset):
