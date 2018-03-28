@@ -43,6 +43,7 @@ def add_real_time_tx(realTimeData, conf):
 
 def getRealTimeTx(sc):
     print("INFO")
+    #TODO password
     ws = create_connection("ws://ws.blockchain.info/inv")
     ws.send(json.dumps({"op": "unconfirmed_sub"}))
     rdd = sc.parallelize(json.loads(ws.recv()).items())\

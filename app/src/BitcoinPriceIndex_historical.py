@@ -125,6 +125,7 @@ def addHistoricalDataset(start, end):
 
 def insertHistoricalDataInBase(conf):
     ''' Initializes the connection'''
+    #TODO password
     connections.create_connection(hosts=conf['hosts'])
     ''' Puts the historical data into elasticsearch '''
     addHistoricalDataset("2010-07-17", str(datetime.date.today()))
