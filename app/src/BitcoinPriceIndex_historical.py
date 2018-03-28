@@ -1,11 +1,13 @@
+import json
+import datetime
+import logging
+
 from http import client as httpClient
 from http import HTTPStatus
 from elasticsearch_dsl.connections import connections
 from elasticsearch import helpers
-import json
-import datetime
-import logging
 from elastic_storage import storeData, eraseData, BitCoin
+from elastic_helper import http_auth
 
 DEFAULT_HOST = "api.coindesk.com"
 DEFAULT_URI = "/v1/bpi/currentprice/EUR.json"
@@ -126,9 +128,10 @@ def addHistoricalDataset(start, end):
 def insertHistoricalDataInBase(conf):
     ''' Initializes the connection'''
     #TODO password
-    connections.create_connection(hosts=conf['hosts'])
+    connections.create_connection(hosts=conf['elasticsearch']['hosts'], http_auth=http_auth(conf['elasticsearch']))
     ''' Puts the historical data into elasticsearch '''
     addHistoricalDataset("2010-07-17", str(datetime.date.today()))
 
 if __name__ == "__main__":
-    insertHistoricalDataInBase({"hosts": ["localhost"]})
+    import config
+    insertHistoricalDataInBase(config)

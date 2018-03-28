@@ -1,18 +1,24 @@
 from websocket import create_connection
 import datetime
 import json
+
 from elasticsearch_dsl.connections import connections
 from elasticsearch import helpers, Elasticsearch
-
-from elastic_storage import eraseData
 
 from pyspark import SparkContext
 from pyspark.streaming import StreamingContext
 
+from elastic_storage import eraseData
+from elastic_helper import http_auth
+
+WEBSOCKET_URL = "ws://ws.blockchain.info/inv"
+WEBSOCKET_REQUEST = json.dumps({"op": "unconfirmed_sub"})
+TIME_FORMAT = '%Y-%m-%dT%H:%M:%S'
+
 def filter_tx(data):
     tx_filter = []
     if 'inputs' in data.keys():
-        time = datetime.datetime.fromtimestamp(int(data['time'])).strftime('%Y-%m-%dT%H:%M:%S')
+        time = datetime.datetime.fromtimestamp(int(data['time'])).strftime(TIME_FORMAT)
         for json in data['inputs']:
             if 'prev_out' in json.keys():
                 current = {}
@@ -34,7 +40,7 @@ def add_real_time_tx(realTimeData, conf):
             "_source":{
                 "type": "real-time",
                 "value": data['value'],
-                "time": {'path': data['date'], 'format':'%Y-%m-%dT%H:%M:%S'}
+                "time": {'path': data['date'], 'format': TIME_FORMAT}
             }
         }
         for data in realTimeData
@@ -44,8 +50,8 @@ def add_real_time_tx(realTimeData, conf):
 def getRealTimeTx(sc):
     print("INFO")
     #TODO password
-    ws = create_connection("ws://ws.blockchain.info/inv")
-    ws.send(json.dumps({"op": "unconfirmed_sub"}))
+    ws = create_connection(WEBSOCKET_URL)
+    ws.send(WEBSOCKET_REQUEST)
     rdd = sc.parallelize(json.loads(ws.recv()).items())\
             .filter(lambda js: type(js[1]) == dict)\
             .map(lambda js: filter_tx(js[1]))\
@@ -53,7 +59,7 @@ def getRealTimeTx(sc):
     return rdd[0]
 
 def insert_real_time_tx(sc, conf):
-    connections.create_connection(hosts=conf['hosts'])
+    connections.create_connection(hosts=conf['elasticsearch']['hosts'], http_auth=http_auth(conf['elasticsearch']))
     #eraseData("real-time", "bitcoin_tx")
     while True:
         rdd = getRealTimeTx(sc)
@@ -61,5 +67,6 @@ def insert_real_time_tx(sc, conf):
         add_real_time_tx(rdd, conf['hosts'])
 
 if __name__ == "__main__":
+    from config import config 
     sc = SparkContext()
-    insert_real_time_tx(sc, {"hosts": ["localhost"]})
+    insert_real_time_tx(sc, config)

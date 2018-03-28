@@ -1,14 +1,16 @@
-from kafka import KafkaConsumer
+import datetime
+import ast
+import json
+
 from pyspark import SparkContext, SparkConf
 from pyspark.streaming import StreamingContext
 from pyspark.streaming.kafka import KafkaUtils
-import json
+
 from elasticsearch_dsl.connections import connections
 from elasticsearch import Elasticsearch, helpers
-import datetime
-import ast
 
-from config import config
+
+from elastic_helper import http_auth
 
 def add_historical_tx(historicalDataset):
     ''' Get data from the API between two dates '''
@@ -58,23 +60,23 @@ def timestampToDate(timestamp):
                 int(timestamp)).strftime("%Y-%m-%d"'T'"%H:%M:%S")
     return time
 
-def send(rdd, host_db="localhost"):
+def send(rdd, config):
     data_tx = rdd.collect()
     if data_tx:
-        connections.create_connection(hosts=[host_db])
+        connections.create_connection(hosts=config['elasticsearch']['hosts'], http_auth=http_auth(config['elasticsearch']))
         add_historical_tx(data_tx[0])
 
-def HisticalTx(master="local[2]", appName="Historical Transaction", group_id='Alone-In-The-Dark', topicName='test', producer_host="localhost", producer_port='2181', db_host="db"): 
+def HisticalTx(config, master="local[2]", appName="Historical Transaction", group_id='Alone-In-The-Dark', topicName='test', producer_host="localhost", producer_port='2181', db_host="db"): 
     sc = SparkContext(master,appName)
     ssc = StreamingContext(sc,batchDuration=5)
     dstream = KafkaUtils.createStream(ssc,producer_host+":"+producer_port,group_id,{topicName:1},kafkaParams={"fetch.message.max.bytes":"1000000000"})\
                         .map(lambda v: ast.literal_eval(v[1]))\
                         .map(filter_tx)
-    dstream.foreachRDD(lambda rdd: send(rdd, host_db=db_host))
+    dstream.foreachRDD(lambda rdd: send(rdd, config))
     dstream.pprint()
     ssc.start()
     ssc.awaitTermination()
 
 if __name__ == "__main__":
-    HisticalTx(db_host=config['hosts'])
-    print("OK")
+    from config import config    
+    HisticalTx(config)

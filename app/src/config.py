@@ -1,7 +1,7 @@
 import logging
 
 config = {
-    'hosts': ['db'], # elastic_search containers
+    'elasticsearch': ['db'], # elasticsearch containers
     'logger': {
         'level': logging.INFO
     }
