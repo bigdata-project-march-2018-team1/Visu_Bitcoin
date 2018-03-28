@@ -147,12 +147,10 @@ def send_to_consumer(start,end,producer):
     list_blocks = getListBlocks_Ndays(start, end)
     for block in list_blocks:
         txs = getListTx_Block(block['id_block'])
-        producer.send('app_topic',str(txs).encode(),timestamp_ms=2000)
+        producer.send('test',str(txs).encode())
+        print("Send...")
+    producer.close()
 
 if __name__ == "__main__":
-    producer = KafkaProducer(acks=1)
-    #send_to_consumer("2018-02-01","2018-02-03",producer)
-    test_blk = block_test()
-    print(test_blk)
-    producer.send('app_topic',str(test_blk).encode())
-    print("Send...")
+    producer = KafkaProducer(acks=1,max_request_size=10000000,bootstrap_servers='localhost:9092')
+    send_to_consumer("2018-02-01","2018-02-03",producer)

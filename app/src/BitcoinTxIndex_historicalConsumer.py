@@ -8,15 +8,7 @@ from elasticsearch import Elasticsearch, helpers
 import datetime
 import ast
 
-
-def get_Tx_Index_from_Kafka(topic):
-    con=KafkaConsumer('json-topic',client_id='Evrim',auto_offset_reset='earliest',group_id='Alone In The Dark',value_deserializer=lambda m: json.loads(m.decode('ascii')))
-    # con.committed(TopicPartition('jason-topic',0))
-    for msg in con:
-        print(msg)
-
-def remplace_to_json_critere(a):
-    return a.replace("\"","&").replace("\'","\"").replace("&","\'")
+from config import config
 
 def add_historical_tx(historicalDataset):
     ''' Get data from the API between two dates '''
@@ -47,17 +39,18 @@ def filter_tx(data,satochiToBitcoin=100000000):
     """
 
     tx_filter = []
-    for json_tx in data['tx']:
-        if 'inputs' in json_tx.keys():
-            time = timestampToDate(json_tx['time'])
-            for json_inputs in json_tx['inputs']:
-                if 'prev_out' in json_inputs.keys():
-                    current = {}
-                    current['date'] = time
-                    current['id_tx'] = json_inputs['prev_out']['tx_index']
-                    current['value'] = float(
-                        json_inputs['prev_out']['value'])/satochiToBitcoin
-                    tx_filter.append(current)
+    if data:
+        for json_tx in data['tx']:
+            if 'inputs' in json_tx.keys():
+                time = timestampToDate(json_tx['time'])
+                for json_inputs in json_tx['inputs']:
+                    if 'prev_out' in json_inputs.keys():
+                        current = {}
+                        current['date'] = time
+                        current['id_tx'] = json_inputs['prev_out']['tx_index']
+                        current['value'] = float(
+                            json_inputs['prev_out']['value'])/satochiToBitcoin
+                        tx_filter.append(current)
     return tx_filter
 
 def timestampToDate(timestamp):
@@ -65,23 +58,23 @@ def timestampToDate(timestamp):
                 int(timestamp)).strftime("%Y-%m-%d"'T'"%H:%M:%S")
     return time
 
-if __name__ == "__main__":
-    print("la")
-    sc = SparkContext(master="local[2]",appName="Test")
+def send(rdd, host_db="localhost"):
+    data_tx = rdd.collect()
+    if data_tx:
+        connections.create_connection(hosts=[host_db])
+        add_historical_tx(data_tx[0])
+
+def HisticalTx(master="local[2]", appName="Historical Transaction", group_id='Alone-In-The-Dark', topicName='test', producer_host="localhost", producer_port='2181', db_host="db"): 
+    sc = SparkContext(master,appName)
     ssc = StreamingContext(sc,batchDuration=5)
-    dstream = KafkaUtils.createStream(ssc,"localhost:2181",'Alone-In-The-Dark',{'app_topic':1})\
-    .map(lambda v: v[1])
+    dstream = KafkaUtils.createStream(ssc,producer_host+":"+producer_port,group_id,{topicName:1},kafkaParams={"fetch.message.max.bytes":"1000000000"})\
+                        .map(lambda v: ast.literal_eval(v[1]))\
+                        .map(filter_tx)
+    dstream.foreachRDD(lambda rdd: send(rdd, host_db=db_host))
     dstream.pprint()
     ssc.start()
     ssc.awaitTermination()
-    print("OK")  
-    '''cons = KafkaConsumer("app_topic",client_id='consumer',auto_offset_reset='earliest',group_id='Alone-In-The-Dark')
-    for tx in cons:
-        rdd = sc.parallelize(str(tx.value.decode()))\
-                .collect()
-        print(rdd)'''
-        
-        #recv = ast.literal_eval(tx.value.decode())
-        #recv_fil = filter_tx(recv)
-        #print(recv_fil)
-        #add_historical_tx(recv_fil)
+
+if __name__ == "__main__":
+    HisticalTx(db_host=config['hosts'])
+    print("OK")
