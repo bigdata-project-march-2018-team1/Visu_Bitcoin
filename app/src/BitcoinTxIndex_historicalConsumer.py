@@ -68,7 +68,6 @@ def timestampToDate(timestamp):
                 int(timestamp)).strftime("%Y-%m-%d"'T'"%H:%M:%S")
     return time
 
-<<<<<<< HEAD
 def send(rdd, host_db="localhost"):
     """ Send to elastic
     
@@ -79,15 +78,11 @@ def send(rdd, host_db="localhost"):
         host_db {str} -- Database host (default: {"localhost"})
     """
 
-=======
-def send(rdd, config):
->>>>>>> 762d2daade477a49d8981a7fa7268fcc2c91800a
     data_tx = rdd.collect()
     if data_tx:
         connections.create_connection(hosts=config['elasticsearch']['hosts'], http_auth=http_auth(config['elasticsearch']))
         add_historical_tx(data_tx[0])
 
-<<<<<<< HEAD
 def HisticalTx(master="local[2]", appName="Historical Transaction", group_id='Alone-In-The-Dark', topicName='test', producer_host="localhost", producer_port='2181', db_host="db"): 
     """ Load data from kafka, filter and send to elastic
     
@@ -101,9 +96,6 @@ def HisticalTx(master="local[2]", appName="Historical Transaction", group_id='Al
         db_host {str} -- Database host (default: {"db"})
     """
 
-=======
-def HisticalTx(config, master="local[2]", appName="Historical Transaction", group_id='Alone-In-The-Dark', topicName='test', producer_host="localhost", producer_port='2181', db_host="db"): 
->>>>>>> 762d2daade477a49d8981a7fa7268fcc2c91800a
     sc = SparkContext(master,appName)
     ssc = StreamingContext(sc,batchDuration=5)
     dstream = KafkaUtils.createStream(ssc,producer_host+":"+producer_port,group_id,{topicName:1},kafkaParams={"fetch.message.max.bytes":"1000000000"})\
