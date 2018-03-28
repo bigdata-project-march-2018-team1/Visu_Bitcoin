@@ -4,6 +4,7 @@ from elasticsearch_dsl.connections import connections
 from elasticsearch import helpers
 import json
 import datetime
+import time
 import logging
 from elastic_storage import storeData, eraseData, BitCoin
 
@@ -29,6 +30,9 @@ def connectionToAPI(host, path):
     result = {}
     if resp.status == HTTPStatus.OK:
         result = json.loads(resp.read().decode('utf-8'))
+    else:
+        time.sleep(10)
+        connectionToAPI(host, path)
     connection.close()
     return result
 

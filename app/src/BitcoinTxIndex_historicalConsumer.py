@@ -71,7 +71,7 @@ def HisticalTx(master="local[2]", appName="Historical Transaction", group_id='Al
                         .map(lambda v: ast.literal_eval(v[1]))\
                         .map(filter_tx)
     dstream.foreachRDD(lambda rdd: send(rdd, host_db=db_host))
-    dstream.pprint()
+    #dstream.pprint()
     ssc.start()
     ssc.awaitTermination()
 
