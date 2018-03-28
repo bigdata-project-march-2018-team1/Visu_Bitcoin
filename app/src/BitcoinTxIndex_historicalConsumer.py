@@ -29,13 +29,13 @@ def add_historical_tx(historicalDataset):
     helpers.bulk(connections.get_connection(), actions)
 
 def filter_tx(data,satochiToBitcoin=100000000):
-    """ Filter the transactions information to keep only date, value and id
+    """ Filter the transactions information to keep only date, value and transaction id
     
     Arguments:
-        data {list} -- [description]
+        data {list} -- All information for a block
     
     Returns:
-        list -- [description]
+        list -- Return only value, date and transaction id
     """
 
     tx_filter = []
@@ -54,17 +54,47 @@ def filter_tx(data,satochiToBitcoin=100000000):
     return tx_filter
 
 def timestampToDate(timestamp):
+    """ Convert timestamp date to datetime date
+    
+    Arguments:
+        timestamp {int} -- Timestamp date
+    
+    Returns:
+        Datetime -- Datetime date
+    """
+
     time = datetime.datetime.fromtimestamp(
                 int(timestamp)).strftime("%Y-%m-%d"'T'"%H:%M:%S")
     return time
 
 def send(rdd, host_db="localhost"):
+    """ Send to elastic
+    
+    Arguments:
+        rdd {RDD} -- Data to send to elastic
+    
+    Keyword Arguments:
+        host_db {str} -- Database host (default: {"localhost"})
+    """
+
     data_tx = rdd.collect()
     if data_tx:
         connections.create_connection(hosts=[host_db])
         add_historical_tx(data_tx[0])
 
 def HisticalTx(master="local[2]", appName="Historical Transaction", group_id='Alone-In-The-Dark', topicName='test', producer_host="localhost", producer_port='2181', db_host="db"): 
+    """ Load data from kafka, filter and send to elastic
+    
+    Keyword Arguments:
+        master {str} -- Master URL to connect to (default: {"local[2]"})
+        appName {str} -- Application name (default: {"Historical Transaction"})
+        group_id {str} -- Group id (default: {'Alone-In-The-Dark'})
+        topicName {str} -- Topic name (default: {'test'})
+        producer_host {str} -- Producer host (default: {"localhost"})
+        producer_port {str} -- Producer port (default: {'2181'})
+        db_host {str} -- Database host (default: {"db"})
+    """
+
     sc = SparkContext(master,appName)
     ssc = StreamingContext(sc,batchDuration=5)
     dstream = KafkaUtils.createStream(ssc,producer_host+":"+producer_port,group_id,{topicName:1},kafkaParams={"fetch.message.max.bytes":"1000000000"})\

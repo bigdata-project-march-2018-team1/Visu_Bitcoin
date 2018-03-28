@@ -8,19 +8,6 @@ from pyspark import SparkContext
 
 from BitcoinTxIndex_historical import getListBlocks_1day, getListBlocks_2dates, stringToDatetime, filterHash_listBlocks, getList_txBlock, filter_tx
 
-'''
-def testListBlocks_1day():
-    """Testing the API
-    """
-    sc = SparkContext()
-    assert getListBlocks_1day(sc,"2012-01-01") != {}
-
-def testListBlocks_2dates():
-    start = "2012-01-01"
-    end = "2012-01-02"
-    sc = SparkContext()
-    assert getListBlocks_2dates(sc,start, end) != {}'''
-
 def teststringToDatetime():
     date = "2012-01-01"
     assert stringToDatetime(date) == datetime.datetime(2012, 1, 1)

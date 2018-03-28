@@ -22,12 +22,11 @@ def connectionToAPI(host, path):
     """ Connexion to the Blockchain API
     
     Arguments:
-        sc {SparkContext} -- [description]
-        host {string} -- [description]
-        path {string} -- [description]
+        host {string} -- API host
+        path {string} -- API uri
     
     Returns:
-        [rdd] -- [description]
+        json -- Return the result of the API call
     """
 
     connection = httpClient.HTTPConnection(host)
@@ -46,15 +45,14 @@ def getListBlocks_1day(date, host=DEFAULT_HOST, uri=URI_BLOCKS):
     """ Get the list of blocks created for a date
     
     Arguments:
-        sc {SparkContext} -- [description]
-        date {string} -- [description]
+        date {string} -- Creation date of the block
     
     Keyword Arguments:
-        host {string} -- [description] (default: {DEFAULT_HOST})
-        uri {string} -- [description] (default: {URI_BLOCKS})
+        host {string} -- API host (default: {DEFAULT_HOST})
+        uri {string} -- API uri (default: {URI_BLOCKS})
     
     Returns:
-        list -- [description]
+        list -- Return all informations about blocks created on date
     """
 
     timestemp = int(time.mktime(datetime.datetime.strptime(
@@ -67,16 +65,15 @@ def getListBlocks_Ndays(start, end, host=DEFAULT_HOST, uri=URI_BLOCKS):
     """ Get the list of blocks created between two date
     
     Arguments:
-        sc {SparkContext} -- [description]
-        start {string} -- [description]
-        end {string} -- [description]
+        start {string} -- Start date
+        end {string} -- End date
     
     Keyword Arguments:
-        host {string} -- [description] (default: {DEFAULT_HOST})
-        uri {string} -- [description] (default: {URI_BLOCKS})
+        host {string} -- API host (default: {DEFAULT_HOST})
+        uri {string} -- API uri (default: {URI_BLOCKS})
     
     Returns:
-        list -- [description]
+        list -- Return all informations about blocks created between two date
     """
 
     blocks_list = []
@@ -93,10 +90,10 @@ def stringToDatetime(date):
     """ Convert a string date to a datetime date
     
     Arguments:
-        date {string} -- [description]
+        date {string} -- Date in string format
     
     Returns:
-        datetime -- [description]
+        datetime -- Date in datetime format
     """
 
     timestemp = int(time.mktime(
@@ -107,10 +104,10 @@ def filter_listBlocks(listBlocks):
     """ Filter the blocks information to keep only hash
     
     Arguments:
-        listBlocks {list} -- [description]
+        listBlocks {list} -- All informations about blocks
     
     Returns:
-        list -- [description]
+        list -- Return only value, date and block id of blocks created
     """
 
     res = []
@@ -125,25 +122,38 @@ def getListTx_Block(block, host=DEFAULT_HOST, path=URI_TRANSACTIONS):
     """ Get transactions for a block
     
     Arguments:
-        sc {SparkContext} -- [description]
-        block {string} -- [description]
+        block {string} -- Block id
     
     Keyword Arguments:
-        host {string} -- [description] (default: {DEFAULT_HOST})
-        path {string} -- [description] (default: {URI_TRANSACTIONS})
+        host {string} -- API host (default: {DEFAULT_HOST})
+        path {string} -- API uri (default: {URI_TRANSACTIONS})
     
     Returns:
-        list -- [description]
+        list -- Return all informations about transactions in a block
     """
 
     return connectionToAPI(host, path + str(block))
 
 def block_test():
+    """ Create a small block (only 5 transactions) for testing
+    
+    Returns:
+        json -- Return a small block
+    """
+
     test_blk = getListTx_Block('0000000000000bae09a7a393a8acded75aa67e46cb81f7acaa5ad94f9eacd103')
     del test_blk['tx'][5:]
     return test_blk
 
 def send_to_consumer(start,end,producer):
+    """ Send blocks cread between start and end to kafka
+    
+    Arguments:
+        start {string} -- Start date
+        end {string} -- End date
+        producer {KafkaProducer} -- Kafka Producer
+    """
+
     list_blocks = getListBlocks_Ndays(start, end)
     for block in list_blocks:
         txs = getListTx_Block(block['id_block'])
