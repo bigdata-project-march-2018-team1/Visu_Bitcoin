@@ -44,14 +44,14 @@ def filter_tx(data,satochiToBitcoin=100000000):
         for json_tx in data['tx']:
             if 'inputs' in json_tx.keys():
                 time = timestampToDate(json_tx['time'])
+                current = {}
+                current['id_tx'] = json_tx['tx_index']
+                current['date'] = time
                 for json_inputs in json_tx['inputs']:
                     if 'prev_out' in json_inputs.keys():
-                        current = {}
-                        current['date'] = time
-                        current['id_tx'] = json_inputs['prev_out']['tx_index']
-                        current['value'] = float(
-                            json_inputs['prev_out']['value'])/satochiToBitcoin
-                        tx_filter.append(current)
+                        current['value'] += float(json_inputs['prev_out']['value'])/satochiToBitcoin
+                current['value'] = current['value'] / len(json_tx['inputs'])
+                tx_filter.append(current)
     return tx_filter
 
 def timestampToDate(timestamp):
@@ -80,10 +80,10 @@ def send(rdd, host_db="localhost"):
 
     data_tx = rdd.collect()
     if data_tx:
-        connections.create_connection(hosts=config['elasticsearch']['hosts'], http_auth=http_auth(config['elasticsearch']))
+        connections.create_connection(hosts='localhost', http_auth=http_auth('elastic'))
         add_historical_tx(data_tx[0])
 
-def HisticalTx(master="local[2]", appName="Historical Transaction", group_id='Alone-In-The-Dark', topicName='test', producer_host="localhost", producer_port='2181', db_host="db"): 
+def HisticalTx(master="local[2]", appName="Historical Transaction", group_id='Alone-In-The-Dark', topicName='topic_tx', producer_host="localhost", producer_port='2181', db_host="db"): 
     """ Load data from kafka, filter and send to elastic
     
     Keyword Arguments:
