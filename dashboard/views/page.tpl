@@ -4,7 +4,8 @@
   <HEAD>
     <TITLE>Bitcoin dashboard</TITLE>
     <meta charset="UTF-8">
-	<link rel="stylesheet" type="text/css" href="/static/style.css">
+		<link rel="stylesheet" type="text/css" href="/static/style.css">
+		<link rel="icon" type="image/png" href="/static/favicon.png" />
   </HEAD>
  
   <body>
