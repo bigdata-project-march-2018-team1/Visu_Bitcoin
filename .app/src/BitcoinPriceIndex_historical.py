@@ -1,13 +1,10 @@
+from http import client as httpClient
+from http import HTTPStatus
+from elasticsearch_dsl.connections import connections
+from elasticsearch import helpers
 import json
 import datetime
 import logging
-
-from http import client as httpClient
-from http import HTTPStatus
-
-from elasticsearch_dsl.connections import connections
-from elasticsearch import helpers
-
 from elastic_storage import storeData, eraseData, BitCoin
 from elastic_helper import http_auth
 
@@ -127,16 +124,11 @@ def addHistoricalDataset(start, end):
     ]
     helpers.bulk(connections.get_connection(), actions)
 
-def insertHistoricalDataInBase(config):
+def insertHistoricalDataInBase(conf):
     ''' Initializes the connection'''
-    #TODO password
-    http_auth_str = http_auth(config['elasticsearch'])
-    elastic_hosts = config['elasticsearch']['hosts']
-    logging.info("Connecting to {0} with auth string {1}".format(elastic_hosts, http_auth_str))
-    connections.create_connection(hosts=elastic_hosts, http_auth=http_auth_str)
+    connections.create_connection(hosts=conf['elasticsearch']['hosts'], http_auth=http_auth(conf['elasticsearch']))
     ''' Puts the historical data into elasticsearch '''
     addHistoricalDataset("2010-07-17", str(datetime.date.today()))
 
 if __name__ == "__main__":
-    from config import config
-    insertHistoricalDataInBase(config)
+    insertHistoricalDataInBase({"hosts": ["localhost"]})

@@ -14,6 +14,6 @@ COPY . /app
 WORKDIR /app
 
 ARG ELASTIC_PASSWORD=$ELASTIC_PASSWORD
-RUN echo "password=\"$ELASTIC_PASSWORD\"" > src/elastic_config.py
+RUN echo "password=\"$ELASTIC_PASSWORD\"" > src/elasticsearch_config.py
 
 CMD spark-submit src/__main__.py

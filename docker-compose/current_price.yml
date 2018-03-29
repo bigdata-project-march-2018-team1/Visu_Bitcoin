@@ -1,0 +1,26 @@
+version: '2.3'
+services:
+    current_price_historical:
+        build:
+            args:
+                - ELASTIC_PASSWORD=$ELASTIC_PASSWORD
+            context: app
+        command: python3 src/BitcoinPriceIndex_historical.py
+        networks:
+            - backend
+    current_price_streaming_consumer:
+        build:
+            args:
+                - ELASTIC_PASSWORD=$ELASTIC_PASSWORD
+            context: app
+        command: spark-submit src/BitcoinPriceIndex_streamingConsumer.py
+        networks:
+            - backend
+    current_price_streaming_producer:
+        build:
+            args:
+                - ELASTIC_PASSWORD=$ELASTIC_PASSWORD
+            context: app
+        command: python3 src/BitcoinPriceIndex_streamingProducer.py
+        networks:
+            - backend

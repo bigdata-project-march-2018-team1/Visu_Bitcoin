@@ -1,0 +1,10 @@
+unalias docker-compose
+# TODO list dir!
+alias docker-compose=""" \
+docker-compose --project-directory . \
+    -f docker-compose/elastic_kibana.yml \
+    -f docker-compose/transaction.yml \
+    -f docker-compose/kafka.yml \
+    -f docker-compose/current_price.yml \
+"""
+

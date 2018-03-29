@@ -1,0 +1,25 @@
+version: '2.3'
+services:
+    producer_tx:
+        build:
+            context: app
+        command: python3 src/BitcoinTxIndex_historicalProducer.py
+        networks:
+            - kafka_net
+        depends_on:
+            - kafka
+            - consumer_tx 
+        command: python src/BitcoinTxIndex_historicalProducer.py
+    consumer_tx:
+        environment:
+            - KAFKA_MAVEN=org.apache.spark:spark-streaming-kafka-0-8-assembly_2.11:2.3.0
+        build:
+            context: app
+        command: ['spark-submit', '--packages',  'org.apache.spark:spark-streaming-kafka-0-8-assembly_2.11:2.3.0', 'src/BitcoinTxIndex_historicalConsumer.py']
+        networks:
+            - kafka_net
+            - backend
+        depends_on:
+            - kafka
+            - db
+

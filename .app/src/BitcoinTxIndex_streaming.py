@@ -1,19 +1,19 @@
 from websocket import create_connection
 import datetime
 import json
-
+import logging
 from elasticsearch_dsl.connections import connections
 from elasticsearch import helpers, Elasticsearch
+
+from elastic_storage import eraseData
 
 from pyspark import SparkContext
 from pyspark.streaming import StreamingContext
 
-from elastic_storage import eraseData
-from elastic_helper import http_auth
-
-WEBSOCKET_URL = "ws://ws.blockchain.info/inv"
-WEBSOCKET_REQUEST = json.dumps({"op": "unconfirmed_sub"})
-TIME_FORMAT = '%Y-%m-%dT%H:%M:%S'
+WEBSOCKET_URL       = "ws://ws.blockchain.info/inv"
+WEBSOCKET_REQUEST   = json.dumps({"op": "unconfirmed_sub"})
+TIME_FORMAT         = '%Y-%m-%dT%H:%M:%S'
+BTC_TO_SATOSHI_RATE = 100000000
 
 def filter_tx(data):
     tx_filter = []
@@ -24,7 +24,7 @@ def filter_tx(data):
                 current = {}
                 current['date'] = str(time)
                 current['id_tx'] = json['prev_out']['tx_index']
-                current['value'] = json['prev_out']['value']/100000000
+                current['value'] = json['prev_out']['value'] / BTC_TO_SATOSHI_RATE
                 tx_filter.append(current)
     return tx_filter
 
@@ -47,9 +47,7 @@ def add_real_time_tx(realTimeData, conf):
     ]
     helpers.bulk(connections.get_connection(), actions)
 
-def getRealTimeTx(sc):
-    print("INFO")
-    #TODO password
+def get_real_time_tx(sc):
     ws = create_connection(WEBSOCKET_URL)
     ws.send(WEBSOCKET_REQUEST)
     rdd = sc.parallelize(json.loads(ws.recv()).items())\
@@ -59,14 +57,13 @@ def getRealTimeTx(sc):
     return rdd[0]
 
 def insert_real_time_tx(sc, conf):
-    connections.create_connection(hosts=conf['elasticsearch']['hosts'], http_auth=http_auth(conf['elasticsearch']))
+    connections.create_connection(hosts=conf['elasticsearch']['hosts'])
     #eraseData("real-time", "bitcoin_tx")
     while True:
-        rdd = getRealTimeTx(sc)
-        print(rdd)
-        add_real_time_tx(rdd, conf['hosts'])
+        rdd = get_real_time_tx(sc)
+        logging.debug(rdd)
+        add_real_time_tx(rdd, conf['elasticsearch']['hosts'])
 
 if __name__ == "__main__":
-    from config import config 
     sc = SparkContext()
-    insert_real_time_tx(sc, config)
+    insert_real_time_tx(sc, {"hosts": ["localhost"]})

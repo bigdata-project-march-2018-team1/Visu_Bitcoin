@@ -7,7 +7,20 @@ config = {
         'username': 'elastic',
         'password': elastic_config.password
     },
+    'zookeeper': {
+        'host': 'zookeeper',
+    },
+    'kafka': {
+        'host': 'kafka',
+        'port':  '9092'
+    },
     'logger': {
         'level': logging.INFO
+    },
+    'price_streaming': {
+        'host': 'current_price_streaming_producer',
+        'port': 9092
     }
 }
+
+logging.basicConfig(**config['logger'])
